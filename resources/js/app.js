@@ -1,0 +1,17 @@
+import './bootstrap';
+
+import 'admin-lte/dist/css/adminlte.min.css';
+import 'admin-lte/dist/js/adminlte.min.js';
+
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
+import Alpine from 'alpinejs';
+import Swiper from 'swiper';
+import 'swiper/css';
+
+window.Alpine = Alpine;
+
+Alpine.start();
