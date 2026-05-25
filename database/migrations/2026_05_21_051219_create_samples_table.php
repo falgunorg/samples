@@ -12,18 +12,20 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('samples', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('company_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('buyer_id')->nullable()->constrained()->nullOnDelete();
             $table->string('po')->nullable();
             $table->string('season')->nullable();
             $table->string('style')->nullable();
             $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('name')->nullable();
             $table->string('color')->nullable();
             $table->string('size_range')->nullable();
             $table->foreignId('sample_type_id')->nullable()->constrained()->nullOnDelete();
-            $table->string('qty');
-            $table->string('tag');
-            $table->string('location');
+            $table->string('qty')->nullable();
+            $table->string('tag')->nullable();
+            $table->string('location')->nullable();
             $table->text('description')->nullable();
             $table->string('fabric')->nullable();
             $table->string('gsm')->nullable();

@@ -78,6 +78,7 @@
             body{
                 font-family:'Inter', sans-serif;
                 background:#f4f6f9;
+               font-size: 12px !important;
             }
 
             .main-header .logo{
@@ -158,8 +159,9 @@
             }
 
             .table>tbody>tr>td{
-                padding:14px;
+                padding:5px;
                 vertical-align:middle;
+                font-size: 12px;
             }
 
             .form-control{

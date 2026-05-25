@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ItemType extends Model
-{
-      protected $guarded = [];
+class Company extends Model {
 
-    public function samples()
-    {
+    protected $guarded = [];
+
+    public function samples() {
         return $this->hasMany(Sample::class);
     }
 }

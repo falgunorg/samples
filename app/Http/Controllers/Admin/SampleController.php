@@ -7,13 +7,15 @@ use App\Models\Sample;
 use App\Models\Buyer;
 use App\Models\Category;
 use App\Models\SampleType;
-use App\Models\ItemType;
 use App\Models\User;
 use App\Models\SampleImage;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use App\Imports\SampleImport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Company;
 
 class SampleController extends Controller {
 
@@ -21,14 +23,15 @@ class SampleController extends Controller {
         $buyers = Buyer::pluck('name', 'id');
         $categories = Category::pluck('name', 'id');
         $sampleTypes = SampleType::pluck('name', 'id');
-        $itemTypes = ItemType::pluck('name', 'id');
+        $companies = Company::pluck('name', 'id');
+
         $users = User::select('id', 'name')->get();
 
-        return view('admin.samples.index', compact('buyers', 'categories', 'sampleTypes', 'itemTypes', 'users'));
+        return view('admin.samples.index', compact('buyers', 'categories', 'sampleTypes', 'users', 'companies'));
     }
 
     public function apiSamples(Request $request) {
-        $query = Sample::with(['buyer', 'category', 'sampleType', 'itemType']);
+        $query = Sample::with(['buyer', 'category', 'sampleType']);
 
         if ($request->has('buyer_filter') && $request->buyer_filter !== 'all') {
             $query->where('buyer_id', $request->buyer_filter);
@@ -73,9 +76,9 @@ class SampleController extends Controller {
         $buyers = Buyer::pluck('name', 'id');
         $categories = Category::pluck('name', 'id');
         $sampleTypes = SampleType::pluck('name', 'id');
-        $itemTypes = ItemType::pluck('name', 'id');
+        $companies = Company::pluck('name', 'id');
 
-        return view('admin.samples.create', compact('buyers', 'categories', 'sampleTypes', 'itemTypes'));
+        return view('admin.samples.create', compact('buyers', 'categories', 'sampleTypes', 'companies'));
     }
 
     public function store(Request $request) {
@@ -124,9 +127,8 @@ class SampleController extends Controller {
         $buyers = Buyer::pluck('name', 'id');
         $categories = Category::pluck('name', 'id');
         $sampleTypes = SampleType::pluck('name', 'id');
-        $itemTypes = ItemType::pluck('name', 'id');
-
-        return view('admin.samples.edit', compact('sample', 'buyers', 'categories', 'sampleTypes', 'itemTypes'));
+        $companies = Company::pluck('name', 'id');
+        return view('admin.samples.edit', compact('sample', 'buyers', 'categories', 'sampleTypes', 'companies'));
     }
 
     public function update(Request $request, $id) {
@@ -177,7 +179,7 @@ class SampleController extends Controller {
 
     public function show($id) {
         // Explicitly load relationships for view processing
-        $sample = Sample::with(['buyer', 'category', 'sampleType', 'itemType', 'images'])->findOrFail($id);
+        $sample = Sample::with(['buyer', 'category', 'sampleType', 'images'])->findOrFail($id);
         return view('admin.samples.show', compact('sample'));
     }
 
@@ -213,5 +215,18 @@ class SampleController extends Controller {
         $image->delete();
 
         return response()->json(['success' => true]);
+    }
+
+    public function import(Request $request) {
+        $request->validate([
+            'excel_file' => 'required|mimes:xlsx,xls,csv|max:2048'
+        ]);
+
+        try {
+            Excel::import(new SampleImport, $request->file('excel_file'));
+            return back()->with('success', 'Samples imported successfully!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error during import: ' . $e->getMessage());
+        }
     }
 }

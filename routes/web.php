@@ -71,7 +71,8 @@ Route::middleware(['auth', 'verified'])
             /* --- Sample Management --- */
             Route::get('samples/api', [AdminSampleController::class, 'apiSamples'])->name('api.samples');
             Route::resource('samples', AdminSampleController::class);
-            Route::delete('samples/gallery-image/{id}', [SampleController::class, 'deleteGalleryImage'])->name('samples.delete_image');
+            Route::post('samples/import', [AdminSampleController::class, 'import'])->name('samples.import');
+            Route::delete('samples/gallery-image/{id}', [AdminSampleController::class, 'deleteGalleryImage'])->name('samples.delete_image');
 
             /* --- Buyer Management --- */
             Route::get('buyers/api', [BuyerController::class, 'apiData'])->name('buyers.api');

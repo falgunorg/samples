@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Buyer;
 use App\Models\Category;
-use App\Models\ItemType;
 use App\Models\Sample;
 use Illuminate\Http\Request;
 
@@ -37,13 +36,11 @@ class SampleController extends Controller {
 
         $buyers = Buyer::all();
         $categories = Category::all();
-        $itemTypes = ItemType::all();
 
         return view('frontend.samples.index', compact(
                         'samples',
                         'buyers',
                         'categories',
-                        'itemTypes'
                 ));
     }
 
@@ -52,7 +49,6 @@ class SampleController extends Controller {
                     'images',
                     'buyer',
                     'category',
-                    'itemType'
                 ])->findOrFail($id);
 
         $relatedSamples = Sample::with('buyer')

@@ -84,7 +84,6 @@
             @csrf
             @method('PATCH')
 
-            <!-- Safe Outer Isolation Inputs -->
             <input type="file" name="thumbnail" id="thumbnail-input" accept="image/*" style="display:none;">
             <input type="file" name="gallery[]" id="gallery-input" accept="image/*" multiple style="display:none;">
 
@@ -95,25 +94,25 @@
                     <div class="row">
                         <div class="col-md-6 form-group">
                             <label>Sample Name <span class="text-danger">*</span></label>
-                            <input type="text" name="sample_name" class="form-control" value="{{ old('sample_name', $sample->sample_name) }}" required>
+                            <input type="text" name="name" class="form-control" value="{{ old('name', $sample->name) }}" required>
                         </div>
                         <div class="col-md-6 form-group">
-                            <label>Style No <span class="text-danger">*</span></label>
-                            <input type="text" name="style_no" class="form-control" value="{{ old('style_no', $sample->style_no) }}" required>
+                            <label>PO / Item Number</label>
+                            <input type="text" name="po" class="form-control" value="{{ old('po', $sample->po) }}">
                         </div>
                     </div>
 
                     <div class="row mt-3">
-                        <div class="col-md-6 form-group">
-                            <label>Buyer (Autocomplete) <span class="text-danger">*</span></label>
-                            <select name="buyer_id" class="form-control select2-autocomplete" style="width: 100%;" required>
-                                @foreach($buyers as $id => $name)
-                                <option value="{{ $id }}" {{ old('buyer_id', $sample->buyer_id) == $id ? 'selected' : '' }}>{{ $name }}</option>
-                                @endforeach
-                            </select>
+                        <div class="col-md-4 form-group">
+                            <label>Season</label>
+                            <input type="text" name="season" class="form-control" value="{{ old('season', $sample->season) }}">
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label>Category (Autocomplete) <span class="text-danger">*</span></label>
+                        <div class="col-md-4 form-group">
+                            <label>Style <span class="text-danger">*</span></label>
+                            <input type="text" name="style" class="form-control" value="{{ old('style', $sample->style) }}" required>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>Category <span class="text-danger">*</span></label>
                             <select name="category_id" class="form-control select2-autocomplete" style="width: 100%;" required>
                                 @foreach($categories as $id => $name)
                                 <option value="{{ $id }}" {{ old('category_id', $sample->category_id) == $id ? 'selected' : '' }}>{{ $name }}</option>
@@ -124,18 +123,18 @@
 
                     <div class="row mt-3">
                         <div class="col-md-6 form-group">
-                            <label>Sample Type (Autocomplete) <span class="text-danger">*</span></label>
-                            <select name="sample_type_id" class="form-control select2-autocomplete" style="width: 100%;" required>
-                                @foreach($sampleTypes as $id => $name)
-                                <option value="{{ $id }}" {{ old('sample_type_id', $sample->sample_type_id) == $id ? 'selected' : '' }}>{{ $name }}</option>
+                            <label>Company <span class="text-danger">*</span></label>
+                            <select name="company_id" class="form-control select2-autocomplete" style="width: 100%;" required>
+                                @foreach($companies as $id => $name)
+                                <option value="{{ $id }}" {{ old('company_id', $sample->company_id) == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="col-md-6 form-group">
-                            <label>Item Type (Autocomplete) <span class="text-danger">*</span></label>
-                            <select name="item_type_id" class="form-control select2-autocomplete" style="width: 100%;" required>
-                                @foreach($itemTypes as $id => $name)
-                                <option value="{{ $id }}" {{ old('item_type_id', $sample->item_type_id) == $id ? 'selected' : '' }}>{{ $name }}</option>
+                            <label>Buyer <span class="text-danger">*</span></label>
+                            <select name="buyer_id" class="form-control select2-autocomplete" style="width: 100%;" required>
+                                @foreach($buyers as $id => $name)
+                                <option value="{{ $id }}" {{ old('buyer_id', $sample->buyer_id) == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -143,7 +142,37 @@
 
                     <div class="row mt-3">
                         <div class="col-md-4 form-group">
-                            <label>Fabric Detail</label>
+                            <label>Color</label>
+                            <input type="text" name="color" class="form-control" value="{{ old('color', $sample->color) }}">
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>Size Range</label>
+                            <input type="text" name="size_range" class="form-control" value="{{ old('size_range', $sample->size_range) }}">
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>Qty <span class="text-danger">*</span></label>
+                            <input type="text" name="qty" class="form-control" value="{{ old('qty', $sample->qty) }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6 form-group">
+                            <label>Sample Type <span class="text-danger">*</span></label>
+                            <select name="sample_type_id" class="form-control select2-autocomplete" style="width: 100%;" required>
+                                @foreach($sampleTypes as $id => $name)
+                                <option value="{{ $id }}" {{ old('sample_type_id', $sample->sample_type_id) == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Location <span class="text-danger">*</span></label>
+                            <input type="text" name="location" class="form-control" value="{{ old('location', $sample->location) }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-4 form-group">
+                            <label>Fabric</label>
                             <input type="text" name="fabric" class="form-control" value="{{ old('fabric', $sample->fabric) }}">
                         </div>
                         <div class="col-md-4 form-group">
@@ -151,13 +180,13 @@
                             <input type="text" name="gsm" class="form-control" value="{{ old('gsm', $sample->gsm) }}">
                         </div>
                         <div class="col-md-4 form-group">
-                            <label>Color</label>
-                            <input type="text" name="color" class="form-control" value="{{ old('color', $sample->color) }}">
+                            <label>Tag / ID <span class="text-danger">*</span></label>
+                            <input type="text" name="tag" class="form-control" value="{{ old('tag', $sample->tag) }}" required>
                         </div>
                     </div>
 
                     <div class="form-group mt-4">
-                        <label>Construction Details & Specifications</label>
+                        <label>Description & Tech Notes</label>
                         <div id="editor-container">{!! old('description', $sample->description) !!}</div>
                         <input type="hidden" name="description" id="description" value="{{ old('description', $sample->description) }}">
                     </div>
@@ -168,17 +197,15 @@
                 <div class="card-premium" style="border-top-color: #f39c12;">
                     <h4 class="fw-bold mb-4 text-dark" style="margin-top:0; font-weight:700;">Media Updates</h4>
 
-                    <!-- Main Thumbnail Box Container -->
                     <div class="form-group">
                         <label class="fw-semibold">Update Main Thumbnail Image</label>
                         <div class="image-preview-box" id="thumbnail-trigger">
-                            <!-- Alignment configuration set directly to your active custom upload subfolders -->
                             @php $thumbUrl = $sample->thumbnail ? asset('upload/' . $sample->thumbnail) : asset('no-image.png') @endphp
-                            <img id="thumbnail-preview" src="{{ $thumbUrl }}" style="max-height: 160px; object-fit: contain; width: 100%;"><p class="text-muted small mt-2 mb-0">Click area to change your current primary photo</p>
+                            <img id="thumbnail-preview" src="{{ $thumbUrl }}" style="max-height: 160px; object-fit: contain; width: 100%;">
+                            <p class="text-muted small mt-2 mb-0">Click area to change your current primary photo</p>
                         </div>
                     </div>
 
-                    <!-- Gallery Drop Area Container -->
                     <div class="form-group mt-4">
                         <label class="fw-semibold">Append Images to Showroom Gallery</label>
                         <div class="image-preview-box mb-3" id="gallery-trigger">
@@ -186,9 +213,8 @@
                             <p class="text-muted small mb-0">Click area to select more sub-images</p>
                         </div>
 
-                        <!-- Saved Collection Blocks -->
                         <div id="existing-gallery-container" class="mt-2">
-                            <label class="text-muted d-block small mb-2">Active Gallery Images (Click × to delete permanently):</label>
+                            <label class="text-muted d-block small mb-2">Active Gallery Images (Click × to delete):</label>
                             <div class="d-flex flex-wrap">
                                 @foreach($sample->images as $photo)
                                 <div class="gallery-preview-item" id="gallery-item-{{ $photo->id }}">
@@ -205,10 +231,10 @@
 
                     <div class="form-group mt-3">
                         <label style="margin-right: 20px; cursor:pointer;">
-                            <input type="checkbox" name="featured" value="1" {{ old('featured', $sample->featured) ? 'checked' : '' }}> <strong>Mark Featured</strong>
+                            <input type="checkbox" name="featured" value="1" {{ old('featured', $sample->featured) ? 'checked' : '' }}> <strong>Featured</strong>
                         </label>
                         <label style="cursor:pointer;">
-                            <input type="checkbox" name="status" value="1" {{ old('status', $sample->status) ? 'checked' : '' }}> <strong>Active Showroom Visibility</strong>
+                            <input type="checkbox" name="status" value="1" {{ old('status', $sample->status) ? 'checked' : '' }}> <strong>Active</strong>
                         </label>
                     </div>
 
@@ -227,74 +253,58 @@
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-        $(document).ready(function() {
-        $('.select2-autocomplete').select2({
-            allowClear: true
-        });
-        var quill = new Quill('#editor-container', {
-            theme: 'snow',
-            placeholder: 'Edit production requirements details...',
-            modules: {
-                toolbar: [
-                    ['bold', 'italic', 'underline'],
-                    [{'header': [1, 2, 3, false]}],
-                    ['clean']
-                ]
-            }
-        });
-        quill.on('text-change', function () {
-            $('#description').val(quill.root.innerHTML);
-        });
-        $('#thumbnail-trigger').on('click', function(e) {
-            $('#thumbnail-input').click();
-        });
-        $('#gallery-trigger').on('click', function(e) {
-            $('#gallery-input').click();
-        });
-        // Loop Bubble Suppressions
-        $('#thumbnail-input, #gallery-input').on('click', function(e) {
-            e.stopPropagation();
-        });
-        $('#thumbnail-input').on('change', function() {
-            if (this.files && this.files[0]) {
-                let reader = new FileReader();
-                reader.onload = (e) => { $('#thumbnail-preview').attr('src', e.target.result); }
-                reader.readAsDataURL(this.files[0]);
-            }
-        });
-        $('#gallery-input').on('change', function() {
-            $('#gallery-preview-container').html('');
-            let files = this.files;
-            if (files) {
-                $.each(files, function(index, file) {
-                    let reader = new FileReader();
-                    reader.onload = function (e) {
-                        let html = `<div class="gallery-preview-item">
-                                        <img src="${e.target.result}">
-                                    </div>`;
-                        $('#gallery-preview-container').append(html);
-                    }
-                    reader.readAsDataURL(file);
-                });
-            }
-        });
-    });
-
-    function removeGalleryImage(photoId) {
-        if (confirm('Remove image from active viewing gallery permanently?')) {
-            $.ajax({
-                url: "{{ url('admin/samples/gallery-image') }}/" + photoId,
-                type: "DELETE",
-                data: {
-                    "_token": "{{ csrf_token() }}"
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $(`#gallery-item-${photoId}`).remove();
-                    }
-                }
-            });
-        }
-    }
+                                        $(document).ready(function() {
+                                        $('.select2-autocomplete').select2({
+                                        allowClear: true,
+                                                placeholder: "Select an option"
+                                        });
+                                        var quill = new Quill('#editor-container', {
+                                        theme: 'snow',
+                                                modules: {
+                                                toolbar: [
+                                                ['bold', 'italic', 'underline'],
+                                                [{'header': [1, 2, 3, false]}],
+                                                [{'list': 'ordered'}, {'list': 'bullet'}],
+                                                ['clean']
+                                                ]
+                                                }
+                                        });
+                                        quill.on('text-change', function () {
+                                        $('#description').val(quill.root.innerHTML);
+                                        });
+                                        $('#thumbnail-trigger').on('click', function() { $('#thumbnail-input').click(); });
+                                        $('#gallery-trigger').on('click', function() { $('#gallery-input').click(); });
+                                        $('#thumbnail-input').on('change', function() {
+                                        if (this.files && this.files[0]) {
+                                        let reader = new FileReader();
+                                        reader.onload = (e) => { $('#thumbnail-preview').attr('src', e.target.result); }
+                                        reader.readAsDataURL(this.files[0]);
+                                        }
+                                        });
+                                        $('#gallery-input').on('change', function() {
+                                        $('#gallery-preview-container').html('');
+                                        $.each(this.files, function(i, file) {
+                                        let reader = new FileReader();
+                                        reader.onload = function (e) {
+                                        $('#gallery-preview-container').append(`<div class="gallery-preview-item"><img src="${e.target.result}"></div>`);
+                                        }
+                                        reader.readAsDataURL(file);
+                                        });
+                                        });
+                                        });
+                                        function removeGalleryImage(photoId) {
+                                        if (confirm('Permanently remove this image from gallery?')) {
+                                        $.ajax({
+                                        url: "{{ url('admin/samples/gallery-image') }}/" + photoId,
+                                                type: "DELETE",
+                                                data: { "_token": "{{ csrf_token() }}" },
+                                                success: function(response) {
+                                                if (response.success) {
+                                                $(`#gallery-item-${photoId}`).fadeOut(300, function() { $(this).remove(); });
+                                                }
+                                                }
+                                        });
+                                        }
+                                        }
 </script>
 @endsection

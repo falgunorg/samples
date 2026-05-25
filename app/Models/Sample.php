@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sample extends Model {
 
+    protected $fillable = [
+        'user_id', 'company_id', 'buyer_id', 'po', 'season', 'style',
+        'category_id', 'name', 'color', 'size_range', 'sample_type_id',
+        'qty', 'tag', 'location', 'featured', 'status'
+    ];
     protected $guarded = [];
 
     public function buyer() {
@@ -18,10 +23,6 @@ class Sample extends Model {
 
     public function sampleType() {
         return $this->belongsTo(SampleType::class);
-    }
-
-    public function itemType() {
-        return $this->belongsTo(ItemType::class);
     }
 
     public function images() {

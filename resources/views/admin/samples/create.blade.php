@@ -22,7 +22,6 @@
         <form action="{{ route('admin.samples.store') }}" method="POST" enctype="multipart/form-data" id="sampleCreateForm">
             @csrf
             
-            <!-- Hidden Input Files Placed Completely Safe Outside of Click Targets -->
             <input type="file" name="thumbnail" id="thumbnail-input" accept="image/*" style="display:none;">
             <input type="file" name="gallery[]" id="gallery-input" accept="image/*" multiple style="display:none;">
 
@@ -33,27 +32,26 @@
                     <div class="row">
                         <div class="col-md-6 form-group">
                             <label>Sample Name <span class="text-danger">*</span></label>
-                            <input type="text" name="sample_name" class="form-control" placeholder="e.g., Premium Oversized Hoodie" value="{{ old('sample_name') }}" required>
+                            <input type="text" name="name" class="form-control" placeholder="e.g., Slim Fit Chino" value="{{ old('name') }}" required>
                         </div>
                         <div class="col-md-6 form-group">
-                            <label>Style No <span class="text-danger">*</span></label>
-                            <input type="text" name="style_no" class="form-control" placeholder="Style Number" value="{{ old('style_no') }}" required>
+                            <label>PO / Item Number</label>
+                            <input type="text" name="po" class="form-control" placeholder="e.g., PO-8821" value="{{ old('po') }}">
                         </div>
                     </div>
 
                     <div class="row mt-3">
-                        <div class="col-md-6 form-group">
-                            <label>Buyer (Autocomplete) <span class="text-danger">*</span></label>
-                            <select name="buyer_id" class="form-control select2-autocomplete" data-placeholder="Search or Select Buyer" style="width: 100%;" required>
-                                <option value=""></option>
-                                @foreach($buyers as $id => $name)
-                                    <option value="{{ $id }}" {{ old('buyer_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
-                                @endforeach
-                            </select>
+                        <div class="col-md-4 form-group">
+                            <label>Season</label>
+                            <input type="text" name="season" class="form-control" placeholder="e.g., SS-2024" value="{{ old('season') }}">
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label>Category (Autocomplete) <span class="text-danger">*</span></label>
-                            <select name="category_id" class="form-control select2-autocomplete" data-placeholder="Search or Select Category" style="width: 100%;" required>
+                        <div class="col-md-4 form-group">
+                            <label>Style <span class="text-danger">*</span></label>
+                            <input type="text" name="style" class="form-control" placeholder="e.g., W2050" value="{{ old('style') }}" required>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>Category <span class="text-danger">*</span></label>
+                            <select name="category_id" class="form-control select2-autocomplete" required>
                                 <option value=""></option>
                                 @foreach($categories as $id => $name)
                                     <option value="{{ $id }}" {{ old('category_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
@@ -64,20 +62,20 @@
 
                     <div class="row mt-3">
                         <div class="col-md-6 form-group">
-                            <label>Sample Type (Autocomplete) <span class="text-danger">*</span></label>
-                            <select name="sample_type_id" class="form-control select2-autocomplete" data-placeholder="Search or Select Type" style="width: 100%;" required>
+                            <label>Company <span class="text-danger">*</span></label>
+                            <select name="company_id" class="form-control select2-autocomplete" required>
                                 <option value=""></option>
-                                @foreach($sampleTypes as $id => $name)
-                                    <option value="{{ $id }}" {{ old('sample_type_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                @foreach($companies as $id => $name)
+                                    <option value="{{ $id }}" {{ old('company_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="col-md-6 form-group">
-                            <label>Item Type (Autocomplete) <span class="text-danger">*</span></label>
-                            <select name="item_type_id" class="form-control select2-autocomplete" data-placeholder="Search or Select Item Type" style="width: 100%;" required>
+                            <label>Buyer <span class="text-danger">*</span></label>
+                            <select name="buyer_id" class="form-control select2-autocomplete" required>
                                 <option value=""></option>
-                                @foreach($itemTypes as $id => $name)
-                                    <option value="{{ $id }}" {{ old('item_type_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                @foreach($buyers as $id => $name)
+                                    <option value="{{ $id }}" {{ old('buyer_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -85,21 +83,52 @@
 
                     <div class="row mt-3">
                         <div class="col-md-4 form-group">
-                            <label>Fabric Detail</label>
-                            <input type="text" name="fabric" class="form-control" placeholder="e.g., 100% Cotton Fleece" value="{{ old('fabric') }}">
+                            <label>Color</label>
+                            <input type="text" name="color" class="form-control" placeholder="e.g., Navy Blue" value="{{ old('color') }}">
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>Size Range</label>
+                            <input type="text" name="size_range" class="form-control" placeholder="e.g., S-XXL" value="{{ old('size_range') }}">
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>Qty <span class="text-danger">*</span></label>
+                            <input type="text" name="qty" class="form-control" placeholder="e.g., 1" value="{{ old('qty', 1) }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6 form-group">
+                            <label>Sample Type <span class="text-danger">*</span></label>
+                            <select name="sample_type_id" class="form-control select2-autocomplete" required>
+                                <option value=""></option>
+                                @foreach($sampleTypes as $id => $name)
+                                    <option value="{{ $id }}" {{ old('sample_type_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Location <span class="text-danger">*</span></label>
+                            <input type="text" name="location" class="form-control" placeholder="e.g., Rack A-1" value="{{ old('location') }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-4 form-group">
+                            <label>Fabric</label>
+                            <input type="text" name="fabric" class="form-control" placeholder="e.g., 100% Cotton" value="{{ old('fabric') }}">
                         </div>
                         <div class="col-md-4 form-group">
                             <label>GSM</label>
-                            <input type="text" name="gsm" class="form-control" placeholder="e.g., 320 GSM" value="{{ old('gsm') }}">
+                            <input type="text" name="gsm" class="form-control" placeholder="e.g., 180" value="{{ old('gsm') }}">
                         </div>
                         <div class="col-md-4 form-group">
-                            <label>Color</label>
-                            <input type="text" name="color" class="form-control" placeholder="e.g., Jet Black" value="{{ old('color') }}">
+                            <label>Tag / ID <span class="text-danger">*</span></label>
+                            <input type="text" name="tag" class="form-control" placeholder="e.g., TAG-990" value="{{ old('tag') }}" required>
                         </div>
                     </div>
 
                     <div class="form-group mt-4">
-                        <label>Construction Details & Specifications</label>
+                        <label>Description & Tech Notes</label>
                         <div id="editor-container">{!! old('description') !!}</div>
                         <input type="hidden" name="description" id="description" value="{{ old('description') }}">
                     </div>
@@ -110,7 +139,6 @@
                 <div class="card-premium" style="border-top-color: #3c8dbc;">
                     <h4 class="fw-bold mb-4 text-dark" style="margin-top:0; font-weight:700;">Sample Media</h4>
                     
-                    <!-- Main Thumbnail Box Container -->
                     <div class="form-group">
                         <label class="fw-semibold">Main Thumbnail Image</label>
                         <div class="image-preview-box" id="thumbnail-trigger">
@@ -119,12 +147,11 @@
                         </div>
                     </div>
 
-                    <!-- Multi Image Gallery Box Container -->
                     <div class="form-group mt-4">
                         <label class="fw-semibold">Product Gallery Images</label>
                         <div class="image-preview-box" id="gallery-trigger">
                             <i class="fa fa-clone fa-2x text-muted"></i>
-                            <p class="text-muted small mb-0">Click area to select companion view sub-images</p>
+                            <p class="text-muted small mb-0">Click area to select multiple gallery images</p>
                         </div>
                         <div id="gallery-preview-container" class="mt-3 d-flex flex-wrap"></div>
                     </div>
@@ -133,10 +160,10 @@
 
                     <div class="form-group mt-3">
                         <label style="margin-right: 20px; cursor:pointer;">
-                            <input type="checkbox" name="featured" value="1" {{ old('featured') ? 'checked' : '' }}> <strong>Mark Featured</strong>
+                            <input type="checkbox" name="featured" value="1" {{ old('featured') ? 'checked' : '' }}> <strong>Featured</strong>
                         </label>
                         <label style="cursor:pointer;">
-                            <input type="checkbox" name="status" value="1" checked> <strong>Active Showroom Visibility</strong>
+                            <input type="checkbox" name="status" value="1" checked> <strong>Active</strong>
                         </label>
                     </div>
 
@@ -157,12 +184,13 @@
 <script>
     $(document).ready(function() {
         $('.select2-autocomplete').select2({
+            placeholder: "Select an option",
             allowClear: true
         });
 
         var quill = new Quill('#editor-container', {
             theme: 'snow',
-            placeholder: 'Write production specifications or detailing items here...',
+            placeholder: 'Write production specifications...',
             modules: {
                 toolbar: [
                     ['bold', 'italic', 'underline'],
@@ -177,46 +205,26 @@
             $('#description').val(quill.root.innerHTML);
         });
 
-        // Click Triggers safely targeting outer input files
-        $('#thumbnail-trigger').on('click', function(e) {
-            $('#thumbnail-input').click();
-        });
+        $('#thumbnail-trigger').on('click', function() { $('#thumbnail-input').click(); });
+        $('#gallery-trigger').on('click', function() { $('#gallery-input').click(); });
 
-        $('#gallery-trigger').on('click', function(e) {
-            $('#gallery-input').click();
-        });
-
-        // Prevent click recursion bubbles explicitly
-        $('#thumbnail-input, #gallery-input').on('click', function(e) {
-            e.stopPropagation();
-        });
-
-        // Handle Image Previews
         $('#thumbnail-input').on('change', function() {
             if (this.files && this.files[0]) {
                 let reader = new FileReader();
-                reader.onload = function(e) { 
-                    $('#thumbnail-preview').attr('src', e.target.result); 
-                }
+                reader.onload = function(e) { $('#thumbnail-preview').attr('src', e.target.result); }
                 reader.readAsDataURL(this.files[0]);
             }
         });
 
         $('#gallery-input').on('change', function() {
             $('#gallery-preview-container').html('');
-            let files = this.files;
-            if(files) {
-                $.each(files, function(index, file) {
-                    let reader = new FileReader();
-                    reader.onload = function (e) {
-                        let html = `<div class="gallery-preview-item">
-                                        <img src="${e.target.result}">
-                                    </div>`;
-                        $('#gallery-preview-container').append(html);
-                    }
-                    reader.readAsDataURL(file);
-                });
-            }
+            $.each(this.files, function(i, file) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#gallery-preview-container').append(`<div class="gallery-preview-item"><img src="${e.target.result}"></div>`);
+                }
+                reader.readAsDataURL(file);
+            });
         });
     });
 </script>
