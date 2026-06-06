@@ -53,6 +53,9 @@ class SampleController extends Controller {
                         ->addColumn('sample_type', function ($sample) {
                             return $sample->sampleType ? $sample->sampleType->name : '<span class="text-muted">N/A</span>';
                         })
+                        ->addColumn('category', function ($sample) {
+                            return $sample->category ? $sample->category->name : '<span class="text-muted">N/A</span>';
+                        })
                         ->addColumn('show_photo', function ($sample) {
                             // Using standard asset path relative to public/upload
                             $url = $sample->thumbnail ? asset('upload/' . $sample->thumbnail) : asset('no-image.png');

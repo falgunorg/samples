@@ -93,6 +93,7 @@
                     <th>Image</th>
                     <th>PO/Item</th>
                     <th>Season</th>
+                    <th>Category</th>
                     <th>Style</th>
                     <th>Item Name</th>
                     <th>Buyer</th>
@@ -175,6 +176,7 @@ $(document).ready(function () {
             {data: 'show_photo', name: 'show_photo', orderable: false, searchable: false},
             {data: 'po', name: 'po'},
             {data: 'season', name: 'season'},
+            {data: 'category', name: 'category'},
             {data: 'style', name: 'style'},
             {data: 'name', name: 'name'},
             {data: 'buyer_name', name: 'buyer.name'},
