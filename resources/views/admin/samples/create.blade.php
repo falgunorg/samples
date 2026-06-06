@@ -4,15 +4,58 @@
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
-    #editor-container { height: 220px; background: white; }
-    .image-preview-box { border: 2px dashed #ccc; padding: 15px; border-radius: 8px; text-align: center; background: #fafafa; cursor: pointer; transition: 0.2s; }
-    .image-preview-box:hover { border-color: #00a65a; background: #f4faf7; }
-    .gallery-preview-item { position: relative; display: inline-block; width: 100px; height: 100px; margin-right: 10px; margin-bottom: 10px; }
-    .gallery-preview-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; }
-    .card-premium { background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 30px; margin-bottom: 30px; border-top: 4px solid #00a65a; }
-    .select2-container--default .select2-selection--single { height: 34px !important; border: 1px solid #d2d6de !important; border-radius: 4px !important; }
-    .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 32px !important; padding-left: 12px !important; }
-    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 32px !important; }
+    #editor-container {
+        height: 220px;
+        background: white;
+    }
+    .image-preview-box {
+        border: 2px dashed #ccc;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        background: #fafafa;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .image-preview-box:hover {
+        border-color: #00a65a;
+        background: #f4faf7;
+    }
+    .gallery-preview-item {
+        position: relative;
+        display: inline-block;
+        width: 100px;
+        height: 100px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    .gallery-preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+    }
+    .card-premium {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        padding: 30px;
+        margin-bottom: 30px;
+        border-top: 4px solid #00a65a;
+    }
+    .select2-container--default .select2-selection--single {
+        height: 34px !important;
+        border: 1px solid #d2d6de !important;
+        border-radius: 4px !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 32px !important;
+        padding-left: 12px !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 32px !important;
+    }
 </style>
 @endsection
 
@@ -21,14 +64,13 @@
     <div class="row">
         <form action="{{ route('admin.samples.store') }}" method="POST" enctype="multipart/form-data" id="sampleCreateForm">
             @csrf
-            
             <input type="file" name="thumbnail" id="thumbnail-input" accept="image/*" style="display:none;">
             <input type="file" name="gallery[]" id="gallery-input" accept="image/*" multiple style="display:none;">
 
             <div class="col-lg-7">
                 <div class="card-premium">
                     <h3 class="fw-bold mb-4 text-dark" style="margin-top:0; font-weight:700;">Register Premium Garment Sample</h3>
-                    
+
                     <div class="row">
                         <div class="col-md-6 form-group">
                             <label>Sample Name <span class="text-danger">*</span></label>
@@ -54,7 +96,7 @@
                             <select name="category_id" class="form-control select2-autocomplete" required>
                                 <option value=""></option>
                                 @foreach($categories as $id => $name)
-                                    <option value="{{ $id }}" {{ old('category_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                <option value="{{ $id }}" {{ old('category_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -66,7 +108,7 @@
                             <select name="company_id" class="form-control select2-autocomplete" required>
                                 <option value=""></option>
                                 @foreach($companies as $id => $name)
-                                    <option value="{{ $id }}" {{ old('company_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                <option value="{{ $id }}" {{ old('company_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -75,7 +117,7 @@
                             <select name="buyer_id" class="form-control select2-autocomplete" required>
                                 <option value=""></option>
                                 @foreach($buyers as $id => $name)
-                                    <option value="{{ $id }}" {{ old('buyer_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                <option value="{{ $id }}" {{ old('buyer_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -102,7 +144,7 @@
                             <select name="sample_type_id" class="form-control select2-autocomplete" required>
                                 <option value=""></option>
                                 @foreach($sampleTypes as $id => $name)
-                                    <option value="{{ $id }}" {{ old('sample_type_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                <option value="{{ $id }}" {{ old('sample_type_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -138,7 +180,7 @@
             <div class="col-lg-5">
                 <div class="card-premium" style="border-top-color: #3c8dbc;">
                     <h4 class="fw-bold mb-4 text-dark" style="margin-top:0; font-weight:700;">Sample Media</h4>
-                    
+
                     <div class="form-group">
                         <label class="fw-semibold">Main Thumbnail Image</label>
                         <div class="image-preview-box" id="thumbnail-trigger">
@@ -182,50 +224,56 @@
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $('.select2-autocomplete').select2({
-            placeholder: "Select an option",
-            allowClear: true
-        });
+$(document).ready(function () {
+    $('.select2-autocomplete').select2({
+        placeholder: "Select an option",
+        allowClear: true
+    });
 
-        var quill = new Quill('#editor-container', {
-            theme: 'snow',
-            placeholder: 'Write production specifications...',
-            modules: {
-                toolbar: [
-                    ['bold', 'italic', 'underline'],
-                    [{'header': [1, 2, 3, false]}],
-                    [{'list': 'ordered'}, {'list': 'bullet'}],
-                    ['clean']
-                ]
+    var quill = new Quill('#editor-container', {
+        theme: 'snow',
+        placeholder: 'Write production specifications...',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline'],
+                [{'header': [1, 2, 3, false]}],
+                [{'list': 'ordered'}, {'list': 'bullet'}],
+                ['clean']
+            ]
+        }
+    });
+
+    quill.on('text-change', function () {
+        $('#description').val(quill.root.innerHTML);
+    });
+
+    $('#thumbnail-trigger').on('click', function () {
+        $('#thumbnail-input').click();
+    });
+    $('#gallery-trigger').on('click', function () {
+        $('#gallery-input').click();
+    });
+
+    $('#thumbnail-input').on('change', function () {
+        if (this.files && this.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                $('#thumbnail-preview').attr('src', e.target.result);
             }
-        });
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
 
-        quill.on('text-change', function () {
-            $('#description').val(quill.root.innerHTML);
-        });
-
-        $('#thumbnail-trigger').on('click', function() { $('#thumbnail-input').click(); });
-        $('#gallery-trigger').on('click', function() { $('#gallery-input').click(); });
-
-        $('#thumbnail-input').on('change', function() {
-            if (this.files && this.files[0]) {
-                let reader = new FileReader();
-                reader.onload = function(e) { $('#thumbnail-preview').attr('src', e.target.result); }
-                reader.readAsDataURL(this.files[0]);
+    $('#gallery-input').on('change', function () {
+        $('#gallery-preview-container').html('');
+        $.each(this.files, function (i, file) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                $('#gallery-preview-container').append(`<div class="gallery-preview-item"><img src="${e.target.result}"></div>`);
             }
-        });
-
-        $('#gallery-input').on('change', function() {
-            $('#gallery-preview-container').html('');
-            $.each(this.files, function(i, file) {
-                let reader = new FileReader();
-                reader.onload = function (e) {
-                    $('#gallery-preview-container').append(`<div class="gallery-preview-item"><img src="${e.target.result}"></div>`);
-                }
-                reader.readAsDataURL(file);
-            });
+            reader.readAsDataURL(file);
         });
     });
+});
 </script>
 @endsection
