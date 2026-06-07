@@ -36,8 +36,14 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::any('/contact', [HomeController::class, 'contact'])->name('contact');
 
 // All Samples
-Route::get('/samples', [SampleController::class, 'index'])->name('samples.index');
-Route::get('/samples-details', [SampleController::class, 'details'])->name('samples.details');
+//Route::get('/samples', [SampleController::class, 'index'])->name('samples.index');
+//Route::get('/samples-details', [SampleController::class, 'details'])->name('samples.details');
+
+Route::group(['prefix' => 'samples', 'as' => 'samples.'], function () {
+    Route::get('/', [SampleController::class, 'index'])->name('index');
+    Route::get('/{id}', [SampleController::class, 'show'])->name('details');
+    Route::post('/{id}/inquiry', [SampleController::class, 'storeInquiry'])->name('inquiry.store');
+});
 
 // Single Sample Details
 Route::get('/samples/{id}', [SampleController::class, 'show'])->name('samples.show');

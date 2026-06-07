@@ -91,10 +91,20 @@
                 <div class="card-premium">
                     <h3 class="fw-bold mb-4 text-dark" style="margin-top:0; font-weight:700;">Modify Sample Profile</h3>
 
+                    @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+
                     <div class="row">
                         <div class="col-md-6 form-group">
                             <label>Sample Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control" value="{{ old('name', $sample->name) }}" required>
+                            <input type="text" name="sample_name" class="form-control" value="{{ old('sample_name', $sample->name) }}" required>
                         </div>
                         <div class="col-md-6 form-group">
                             <label>PO / Item Number</label>
@@ -108,8 +118,8 @@
                             <input type="text" name="season" class="form-control" value="{{ old('season', $sample->season) }}">
                         </div>
                         <div class="col-md-4 form-group">
-                            <label>Style <span class="text-danger">*</span></label>
-                            <input type="text" name="style" class="form-control" value="{{ old('style', $sample->style) }}" required>
+                            <label>Style No <span class="text-danger">*</span></label>
+                            <input type="text" name="style_no" class="form-control" value="{{ old('style_no', $sample->style) }}" required>
                         </div>
                         <div class="col-md-4 form-group">
                             <label>Category <span class="text-danger">*</span></label>
@@ -151,7 +161,7 @@
                         </div>
                         <div class="col-md-4 form-group">
                             <label>Qty <span class="text-danger">*</span></label>
-                            <input type="text" name="qty" class="form-control" value="{{ old('qty', $sample->qty) }}" required>
+                            <input type="number" name="qty" class="form-control" value="{{ old('qty', $sample->qty) }}" required>
                         </div>
                     </div>
 
@@ -164,24 +174,28 @@
                                 @endforeach
                             </select>
                         </div>
+
+                    </div>
+
+                    <div class="row mt-3">
                         <div class="col-md-6 form-group">
                             <label>Location <span class="text-danger">*</span></label>
                             <input type="text" name="location" class="form-control" value="{{ old('location', $sample->location) }}" required>
                         </div>
+                        <div class="col-md-6 form-group">
+                            <label>Tag / ID <span class="text-danger">*</span></label>
+                            <input type="text" name="tag" class="form-control" value="{{ old('tag', $sample->tag) }}" required>
+                        </div>
                     </div>
 
                     <div class="row mt-3">
-                        <div class="col-md-4 form-group">
+                        <div class="col-md-6 form-group">
                             <label>Fabric</label>
                             <input type="text" name="fabric" class="form-control" value="{{ old('fabric', $sample->fabric) }}">
                         </div>
-                        <div class="col-md-4 form-group">
+                        <div class="col-md-6 form-group">
                             <label>GSM</label>
                             <input type="text" name="gsm" class="form-control" value="{{ old('gsm', $sample->gsm) }}">
-                        </div>
-                        <div class="col-md-4 form-group">
-                            <label>Tag / ID <span class="text-danger">*</span></label>
-                            <input type="text" name="tag" class="form-control" value="{{ old('tag', $sample->tag) }}" required>
                         </div>
                     </div>
 
@@ -200,7 +214,11 @@
                     <div class="form-group">
                         <label class="fw-semibold">Update Main Thumbnail Image</label>
                         <div class="image-preview-box" id="thumbnail-trigger">
-                            @php $thumbUrl = $sample->thumbnail ? asset('upload/' . $sample->thumbnail) : asset('no-image.png') @endphp
+                            @php 
+                            // Fetch the primary display thumbnail entry directly from public/upload/samples/ directory tracking
+                            $mainThumbRecord = $sample->images()->where('image_path', 'NOT LIKE', 'gallery/%')->first();
+                            $thumbUrl = $mainThumbRecord ? asset('upload/samples/' . $mainThumbRecord->image_path) : asset('no-image.png');
+                            @endphp
                             <img id="thumbnail-preview" src="{{ $thumbUrl }}" style="max-height: 160px; object-fit: contain; width: 100%;">
                             <p class="text-muted small mt-2 mb-0">Click area to change your current primary photo</p>
                         </div>
@@ -216,10 +234,10 @@
                         <div id="existing-gallery-container" class="mt-2">
                             <label class="text-muted d-block small mb-2">Active Gallery Images (Click × to delete):</label>
                             <div class="d-flex flex-wrap">
-                                @foreach($sample->images as $photo)
+                                @foreach($sample->images()->where('image_path', 'LIKE', 'gallery/%')->get() as $photo)
                                 <div class="gallery-preview-item" id="gallery-item-{{ $photo->id }}">
                                     <button type="button" class="delete-photo-btn" onclick="removeGalleryImage({{ $photo->id }})">×</button>
-                                    <img src="{{ asset('upload/' . $photo->image_path) }}">
+                                    <img src="{{ asset('upload/samples/' . $photo->image_path) }}">
                                 </div>
                                 @endforeach
                             </div>
@@ -234,7 +252,7 @@
                             <input type="checkbox" name="featured" value="1" {{ old('featured', $sample->featured) ? 'checked' : '' }}> <strong>Featured</strong>
                         </label>
                         <label style="cursor:pointer;">
-                            <input type="checkbox" name="status" value="1" {{ old('status', $sample->status) ? 'checked' : '' }}> <strong>Active</strong>
+                            <input type="checkbox" name="status" value="1" {{ old('status', $sample->status) === 'active' ? 'checked' : '' }}> <strong>Active</strong>
                         </label>
                     </div>
 
@@ -263,8 +281,8 @@
                                                 modules: {
                                                 toolbar: [
                                                 ['bold', 'italic', 'underline'],
-                                                [{'header': [1, 2, 3, false]}],
-                                                [{'list': 'ordered'}, {'list': 'bullet'}],
+                                                ['+123', {'header': [1, 2, 3, false]}],
+                                                ['ol', {'list': 'ordered'}, {'list': 'bullet'}],
                                                 ['clean']
                                                 ]
                                                 }
@@ -295,6 +313,7 @@
                                         function removeGalleryImage(photoId) {
                                         if (confirm('Permanently remove this image from gallery?')) {
                                         $.ajax({
+                                        // Route configuration matching web.php definitions perfectly
                                         url: "{{ url('admin/samples/gallery-image') }}/" + photoId,
                                                 type: "DELETE",
                                                 data: { "_token": "{{ csrf_token() }}" },
@@ -302,6 +321,9 @@
                                                 if (response.success) {
                                                 $(`#gallery-item-${photoId}`).fadeOut(300, function() { $(this).remove(); });
                                                 }
+                                                },
+                                                error: function(xhr) {
+                                                console.error("AJAX validation runtime structural link breakdown.", xhr);
                                                 }
                                         });
                                         }

@@ -11,75 +11,90 @@ use Illuminate\Http\Request;
 class SampleController extends Controller {
 
     public function index(Request $request) {
-        $query = Sample::query();
+        $search = trim($request->input('search'));
+        $buyerFilter = $request->input('buyer');
+        $categoryFilter = $request->input('category');
 
-        if ($request->search) {
-            $query->where(function ($q) use ($request) {
-                $q->where('sample_name', 'like', '%' . $request->search . '%')
-                        ->orWhere('style_no', 'like', '%' . $request->search . '%');
+        // 1. Build Query with eager loading relationships
+        $query = Sample::with(['buyer', 'category', 'images']);
+
+        $query->where(function ($q) {
+            $q->where('status', 'active')
+                    ->orWhere('status', 'Active')
+                    ->orWhere('status', '1');
+        });
+
+        // Apply Filters
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                        ->orWhere('style', 'LIKE', "%{$search}%")
+                        ->orWhere('po', 'LIKE', "%{$search}%");
             });
         }
 
-        if ($request->buyer) {
-            $query->where('buyer_id', $request->buyer);
+        if ($buyerFilter && !in_array($buyerFilter, ['All Buyers', 'All', ''])) {
+            $query->whereHas('buyer', function ($q) use ($buyerFilter) {
+                $q->where('name', $buyerFilter);
+            });
         }
 
-        if ($request->category) {
-            $query->where('category_id', $request->category);
+        if ($categoryFilter && !in_array($categoryFilter, ['All Categories', 'All', ''])) {
+            $query->whereHas('category', function ($q) use ($categoryFilter) {
+                $q->where('name', $categoryFilter);
+            });
         }
 
-        if ($request->item_type) {
-            $query->where('item_type_id', $request->item_type);
+        // Paginate matching records
+        $samples = $query->latest()->paginate(12)->withQueryString();
+
+        if ($request->ajax()) {
+            return view('frontend.samples.partials.grid_items', compact('samples'))->render();
         }
 
-        $samples = $query->latest()->paginate(12);
+        // Dropdown populations
+        $buyers = Buyer::has('samples')->get();
+        if ($buyers->isEmpty()) {
+            $buyers = Buyer::all();
+        }
 
-        $buyers = Buyer::all();
-        $categories = Category::all();
+        // Full Category list for original select dropdown options
+        $allCategories = Category::has('samples')->get();
+        if ($allCategories->isEmpty()) {
+            $allCategories = Category::all();
+        }
 
-        return view('frontend.samples.index', compact(
-                        'samples',
-                        'buyers',
-                        'categories',
-                ));
+        // Dynamic extraction of TOP 5 categories by total active samples
+        $topCategories = Category::withCount(['samples' => function ($q) {
+                        $q->where('status', 'active')->orWhere('status', 'Active')->orWhere('status', '1');
+                    }])->orderBy('samples_count', 'desc')->take(11)->get();
+
+        return view('frontend.samples.index', compact('samples', 'buyers', 'allCategories', 'topCategories'));
     }
 
     public function show($id) {
-        $sample = Sample::with([
-                    'images',
-                    'buyer',
-                    'category',
-                ])->findOrFail($id);
-
-        $relatedSamples = Sample::with('buyer')
+        $sample = Sample::with(['buyer', 'category', 'images', 'sampleType'])->findOrFail($id);
+        $relatedSamples = Sample::with(['buyer', 'category'])
                 ->where('category_id', $sample->category_id)
                 ->where('id', '!=', $sample->id)
-                ->take(4)
+                ->limit(4)
                 ->get();
 
-        return view('frontend.samples.show', compact(
-                        'sample',
-                        'relatedSamples'
-                ));
+        return view('frontend.samples.show', compact('sample', 'relatedSamples'));
     }
 
-    public function details() {
-        return view('frontend.samples.show');
-    }
+    public function storeInquiry(Request $request, $id) {
+        $sample = Sample::findOrFail($id);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'nullable|string|max:50',
+            'company' => 'nullable|string|max:255',
+            'message' => 'required|string|min:10',
+        ]);
+        $validated['sample_id'] = $sample->id;
+        \App\Models\Inquiry::create($validated);
 
-    public function ajaxFilter(Request $request) {
-        $samples = Sample::query();
-
-        if ($request->search) {
-            $samples->where('sample_name', 'like', '%' . $request->search . '%');
-        }
-
-        if ($request->buyer) {
-            $samples->where('buyer_id', $request->buyer);
-        }
-
-        $samples = $samples->latest()->get();
-
-        return view('frontend.samples.ajax', compact('samples'))->render();
+        return redirect()->back()->with('success', 'Your inquiry has been sent successfully!');
     }
 }

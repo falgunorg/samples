@@ -19,59 +19,172 @@ use App\Models\Company;
 
 class SampleController extends Controller {
 
-    public function index() {
-        $buyers = Buyer::pluck('name', 'id');
-        $categories = Category::pluck('name', 'id');
-        $sampleTypes = SampleType::pluck('name', 'id');
-        $companies = Company::pluck('name', 'id');
+   public function index(Request $request) {
+    $buyers = Buyer::pluck('name', 'id');
+    $categories = Category::pluck('name', 'id');
+    $sampleTypes = SampleType::pluck('name', 'id');
+    $companies = Company::pluck('name', 'id');
+    $users = User::select('id', 'name')->get();
 
-        $users = User::select('id', 'name')->get();
+    // Session State Management Tracker
+    // If the URL has query parameters, the user is modifying filters -> Save them to session.
+    // If the URL is empty but session has old data -> Use session data.
+    $filterKeys = ['search', 'buyer_id', 'category_id', 'location', 'sort_by', 'sort_order', 'page'];
 
-        return view('admin.samples.index', compact('buyers', 'categories', 'sampleTypes', 'users', 'companies'));
+    if ($request->anyFilled($filterKeys) || $request->has('page')) {
+        foreach ($filterKeys as $key) {
+            session(['samples_index_' . $key => $request->input($key)]);
+        }
+    } else {
+        // No explicit query parameters: Pull previously stored parameters back into the request context
+        foreach ($filterKeys as $key) {
+            if (session()->has('samples_index_' . $key)) {
+                $request->merge([$key => session('samples_index_' . $key)]);
+            }
+        }
     }
 
-    public function apiSamples(Request $request) {
-        $query = Sample::with(['buyer', 'category', 'sampleType']);
+    // Initialize Query Builder
+    $samples = Sample::with([
+        'buyer',
+        'category',
+        'sampleType',
+        'images'
+    ]);
 
-        if ($request->has('buyer_filter') && $request->buyer_filter !== 'all') {
+    // Global Search
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $samples->where(function ($q) use ($search) {
+            $q->where('po', 'like', "%{$search}%")
+                ->orWhere('season', 'like', "%{$search}%")
+                ->orWhere('style', 'like', "%{$search}%")
+                ->orWhere('name', 'like', "%{$search}%")
+                ->orWhere('color', 'like', "%{$search}%")
+                ->orWhere('tag', 'like', "%{$search}%")
+                ->orWhere('location', 'like', "%{$search}%")
+                ->orWhere('qty', 'like', "%{$search}%")
+                ->orWhereHas('buyer', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('category', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+        });
+    }
+
+    // Buyer Filter
+    if ($request->filled('buyer_id')) {
+        $samples->where('buyer_id', $request->buyer_id);
+    }
+
+    // Category Filter
+    if ($request->filled('category_id')) {
+        $samples->where('category_id', $request->category_id);
+    }
+
+    // Company Filter
+    if ($request->filled('company_id')) {
+        $samples->where('company_id', $request->company_id);
+    }
+
+    // Sample Type Filter
+    if ($request->filled('sample_type_id')) {
+        $samples->where('sample_type_id', $request->sample_type_id);
+    }
+
+    // Color Filter
+    if ($request->filled('color')) {
+        $samples->where('color', 'like', '%' . $request->color . '%');
+    }
+
+    // Tag Filter
+    if ($request->filled('tag')) {
+        $samples->where('tag', 'like', '%' . $request->tag . '%');
+    }
+
+    // Location Filter
+    if ($request->filled('location')) {
+        $samples->where('location', 'like', '%' . $request->location . '%');
+    }
+
+    // Dynamic Sorting Logic mapping
+    $sortBy = $request->sort_by ?? 'id'; 
+    $sortOrder = strtolower($request->sort_order) === 'asc' ? 'asc' : 'desc';
+    $allowedSorts = ['id', 'po', 'season', 'style', 'name', 'color', 'qty', 'created_at'];
+
+    if (in_array($sortBy, $allowedSorts)) {
+        $samples->orderBy($sortBy, $sortOrder);
+    } else {
+        $samples->orderBy('id', 'desc');
+    }
+
+    // Execute Pagination (Reads current page from the merged request context smoothly)
+    $samples = $samples->paginate(50)->withQueryString();
+
+    return view('admin.samples.index', compact(
+        'buyers',
+        'categories',
+        'sampleTypes',
+        'users',
+        'companies',
+        'samples'
+    ));
+}
+
+    public function apiSamples(Request $request) {
+        // 1. Build Query with relationships and hardcode your descending sort order directly into Eloquent
+        $query = Sample::with(['buyer', 'category', 'sampleType', 'images'])
+                ->orderBy('created_at', 'desc');
+
+        // 2. Apply dropdown filters if they are active
+        if ($request->has('buyer_filter') && $request->buyer_filter !== 'all' && !empty($request->buyer_filter)) {
             $query->where('buyer_id', $request->buyer_filter);
         }
-        if ($request->has('category_filter') && $request->category_filter !== 'all') {
+        if ($request->has('category_filter') && $request->category_filter !== 'all' && !empty($request->category_filter)) {
             $query->where('category_id', $request->category_filter);
         }
 
+        // 3. Process via DataTables engine
         return DataTables::of($query)
                         ->addColumn('checkbox', function ($sample) {
                             return '<input type="checkbox" class="sample-checkbox" value="' . $sample->id . '">';
                         })
                         ->addColumn('buyer_name', function ($sample) {
-                            return $sample->buyer ? $sample->buyer->name : '<span class="text-muted">N/A</span>';
+                            return $sample->buyer ? e($sample->buyer->name) : '<span class="text-muted">N/A</span>';
                         })
                         ->addColumn('category_name', function ($sample) {
-                            return $sample->category ? $sample->category->name : '<span class="text-muted">N/A</span>';
+                            return $sample->category ? e($sample->category->name) : '<span class="text-muted">N/A</span>';
                         })
                         ->addColumn('sample_type', function ($sample) {
-                            return $sample->sampleType ? $sample->sampleType->name : '<span class="text-muted">N/A</span>';
+                            return $sample->sampleType ? e($sample->sampleType->name) : '<span class="text-muted">N/A</span>';
                         })
                         ->addColumn('category', function ($sample) {
-                            return $sample->category ? $sample->category->name : '<span class="text-muted">N/A</span>';
+                            return $sample->category ? e($sample->category->name) : '<span class="text-muted">N/A</span>';
                         })
                         ->addColumn('show_photo', function ($sample) {
-                            // Using standard asset path relative to public/upload
-                            $url = $sample->thumbnail ? asset('upload/' . $sample->thumbnail) : asset('no-image.png');
-                            return '<img src="' . $url . '" class="img-thumbnail" style="width:50px; height:50px; object-fit:cover;">';
+                            $mainThumbRecord = $sample->images->first(function ($image) {
+                                return !str_contains($image->image_path, 'gallery/');
+                            });
+                            $url = $mainThumbRecord ? asset('upload/samples/' . $mainThumbRecord->image_path) : asset('no-image.png');
+                            return '<img src="' . $url . '" class="img-thumbnail" style="width:50px; height:50px; object-fit:cover;" onerror="this.src=\'' . asset('no-image.png') . '\'">';
                         })
                         ->addColumn('status_label', function ($sample) {
-                            return $sample->status ? '<span class="label label-success">Active</span>' : '<span class="label label-danger">Inactive</span>';
+                            return strtolower($sample->status) === 'active' || $sample->status == 1 ? '<span class="label label-success">Active</span>' : '<span class="label label-danger">Inactive</span>';
                         })
                         ->addColumn('action', function ($sample) {
                             return '<div class="btn-group">' .
-                                    '<a href="' . route('admin.samples.show', $sample->id) . '" class="btn btn-sm btn-default" title="View Token"><i class="fa fa-eye"></i></a>' .
+                                    '<a href="' . route('admin.samples.show', $sample->id) . '" class="btn btn-sm btn-default" title="View"><i class="fa fa-eye"></i></a>' .
                                     '<a href="' . route('admin.samples.edit', $sample->id) . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-pencil"></i></a>' .
                                     '<button onclick="deleteData(' . $sample->id . ')" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>' .
                                     '</div>';
                         })
-                        ->rawColumns(['checkbox', 'buyer_name', 'category_name', 'sample_type', 'show_photo', 'status_label', 'action'])
+                        ->rawColumns(['checkbox', 'buyer_name', 'category_name', 'sample_type', 'category', 'show_photo', 'status_label', 'action'])
+
+                        // Bypass Yajra DataTables dynamic query sort overrides completely
+                        ->order(function ($q) {
+                            // Leave this empty so DataTables doesn't try to change your Eloquent sort order
+                        })
                         ->make(true);
     }
 
@@ -91,33 +204,51 @@ class SampleController extends Controller {
             'buyer_id' => 'required|exists:buyers,id',
             'category_id' => 'required|exists:categories,id',
             'sample_type_id' => 'required|exists:sample_types,id',
-            'item_type_id' => 'required|exists:item_types,id',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,avif,webp|max:2048',
             'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,avif,webp|max:2048',
         ]);
 
-        $data = $request->except(['thumbnail', 'gallery']);
-        $data['featured'] = $request->has('featured');
-        $data['status'] = $request->has('status');
+        // Explicitly map inputs onto your precise Model database columns
+        $data = [
+            'name' => $request->input('sample_name'),
+            'style' => $request->input('style_no'),
+            'buyer_id' => $request->input('buyer_id'),
+            'category_id' => $request->input('category_id'),
+            'sample_type_id' => $request->input('sample_type_id'),
+            'po' => $request->input('po'),
+            'season' => $request->input('season'),
+            'color' => $request->input('color'),
+            'size_range' => $request->input('size_range'),
+            'qty' => $request->input('qty', 0),
+            'tag' => $request->input('tag', 'New Arrival'),
+            'location' => $request->input('location'),
+            'user_id' => auth()->id() ?? $request->input('user_id'),
+            'company_id' => $request->input('company_id'),
+            'featured' => $request->has('featured') ? 1 : 0,
+            'status' => $request->has('status') ? 1 : 0,
+        ];
 
-        // Handle Main Thumbnail Upload directly into public/upload/samples
+        $sample = Sample::create($data);
+
+        // Handle Thumbnail Upload -> Save raw filename into the image mapping relationship table
         if ($request->hasFile('thumbnail')) {
             $file = $request->file('thumbnail');
             $filename = 'thumb_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('upload/samples'), $filename);
-            $data['thumbnail'] = 'samples/' . $filename;
+
+            $sample->images()->create([
+                'image_path' => $filename // Stored raw without path prefix anomalies
+            ]);
         }
 
-        $sample = Sample::create($data);
-
-        // Handle Gallery Uploads directly into public/upload/samples/gallery
+        // Handle Secondary Gallery Uploads -> Save into public/upload/samples/gallery/
         if ($request->hasFile('gallery')) {
             foreach ($request->file('gallery') as $imageFile) {
                 $filename = 'gal_' . time() . '_' . uniqid() . '.' . $imageFile->getClientOriginalExtension();
                 $imageFile->move(public_path('upload/samples/gallery'), $filename);
 
                 $sample->images()->create([
-                    'image_path' => 'samples/gallery/' . $filename
+                    'image_path' => 'gallery/' . $filename
                 ]);
             }
         }
@@ -125,15 +256,22 @@ class SampleController extends Controller {
         return redirect()->route('admin.samples.index')->with('success', 'Garment Sample successfully registered!');
     }
 
+    /**
+     * Show the form for editing the specified resource.
+     */
     public function edit($id) {
         $sample = Sample::with('images')->findOrFail($id);
         $buyers = Buyer::pluck('name', 'id');
         $categories = Category::pluck('name', 'id');
         $sampleTypes = SampleType::pluck('name', 'id');
         $companies = Company::pluck('name', 'id');
+
         return view('admin.samples.edit', compact('sample', 'buyers', 'categories', 'sampleTypes', 'companies'));
     }
 
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, $id) {
         $sample = Sample::findOrFail($id);
 
@@ -143,36 +281,63 @@ class SampleController extends Controller {
             'buyer_id' => 'required|exists:buyers,id',
             'category_id' => 'required|exists:categories,id',
             'sample_type_id' => 'required|exists:sample_types,id',
-            'item_type_id' => 'required|exists:item_types,id',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,avif,webp|max:2048',
             'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,avif,webp|max:2048',
         ]);
 
-        $data = $request->except(['thumbnail', 'gallery']);
-        $data['featured'] = $request->has('featured');
-        $data['status'] = $request->has('status');
+        // Explicitly map updated inputs to your Model database schema properties
+        $data = [
+            'name' => $request->input('sample_name'),
+            'style' => $request->input('style_no'),
+            'buyer_id' => $request->input('buyer_id'),
+            'category_id' => $request->input('category_id'),
+            'sample_type_id' => $request->input('sample_type_id'),
+            'po' => $request->input('po'),
+            'season' => $request->input('season'),
+            'color' => $request->input('color'),
+            'size_range' => $request->input('size_range'),
+            'qty' => $request->input('qty', 0),
+            'tag' => $request->input('tag', 'New Arrival'),
+            'location' => $request->input('location'),
+            'company_id' => $request->input('company_id'),
+            'featured' => $request->has('featured') ? 1 : 0,
+            'status' => $request->has('status') ? 1 : 0,
+        ];
 
+        // Process Thumbnail Swap updates cleanly
         if ($request->hasFile('thumbnail')) {
-            // Unlink current file if existing from native public path
-            if ($sample->thumbnail && File::exists(public_path('upload/' . $sample->thumbnail))) {
-                File::delete(public_path('upload/' . $sample->thumbnail));
+            // Find and extract the old main image entry (doesn't contain gallery/ directory sub-string)
+            $oldMainImage = $sample->images()->where('image_path', 'NOT LIKE', 'gallery/%')->first();
+
+            if ($oldMainImage) {
+                $oldFilePath = public_path('upload/samples/' . $oldMainImage->image_path);
+                if (File::exists($oldFilePath)) {
+                    File::delete($oldFilePath);
+                }
+                $oldMainImage->delete(); // Remove old image tracking row
             }
 
+            // Save new display thumbnail asset
             $file = $request->file('thumbnail');
             $filename = 'thumb_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('upload/samples'), $filename);
-            $data['thumbnail'] = 'samples/' . $filename;
+
+            $sample->images()->create([
+                'image_path' => $filename
+            ]);
         }
 
+        // Apply textual update arrays directly
         $sample->update($data);
 
+        // Process Additional Multi-Gallery Append uploads
         if ($request->hasFile('gallery')) {
             foreach ($request->file('gallery') as $imageFile) {
                 $filename = 'gal_' . time() . '_' . uniqid() . '.' . $imageFile->getClientOriginalExtension();
                 $imageFile->move(public_path('upload/samples/gallery'), $filename);
 
                 $sample->images()->create([
-                    'image_path' => 'samples/gallery/' . $filename
+                    'image_path' => 'gallery/' . $filename
                 ]);
             }
         }
@@ -180,39 +345,51 @@ class SampleController extends Controller {
         return redirect()->route('admin.samples.index')->with('success', 'Garment Sample updated successfully!');
     }
 
+    /**
+     * Display the specified resource.
+     */
     public function show($id) {
-        // Explicitly load relationships for view processing
         $sample = Sample::with(['buyer', 'category', 'sampleType', 'images'])->findOrFail($id);
         return view('admin.samples.show', compact('sample'));
     }
 
+    /**
+     * Remove the specified resource from storage along with all related assets.
+     */
     public function destroy($id) {
         $sample = Sample::with('images')->findOrFail($id);
 
-        if ($sample->thumbnail && File::exists(public_path('upload/' . $sample->thumbnail))) {
-            File::delete(public_path('upload/' . $sample->thumbnail));
-        }
-
+        // Delete all images mapped in your relationship table safely from physical disk locations
         foreach ($sample->images as $photo) {
-            if ($photo->image_path && File::exists(public_path('upload/' . $photo->image_path))) {
-                File::delete(public_path('upload/' . $photo->image_path));
+            if ($photo->image_path) {
+                $targetDiskPath = public_path('upload/samples/' . $photo->image_path);
+                if (File::exists($targetDiskPath)) {
+                    File::delete($targetDiskPath);
+                }
             }
             $photo->delete();
         }
 
+        // Drop parent sample data profile row natively
         $sample->delete();
 
         return response()->json([
                     'success' => true,
-                    'message' => 'Sample profile permanently purged.'
+                    'message' => 'Sample profile and all image files permanently purged.'
         ]);
     }
 
+    /**
+     * Delete an isolated individual gallery image item via async interface demands.
+     */
     public function deleteGalleryImage($id) {
         $image = SampleImage::findOrFail($id);
 
-        if ($image->image_path && File::exists(public_path('upload/' . $image->image_path))) {
-            File::delete(public_path('upload/' . $image->image_path));
+        if ($image->image_path) {
+            $targetDiskPath = public_path('upload/samples/' . $image->image_path);
+            if (File::exists($targetDiskPath)) {
+                File::delete($targetDiskPath);
+            }
         }
 
         $image->delete();

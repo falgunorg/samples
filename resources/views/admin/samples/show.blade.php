@@ -132,71 +132,110 @@
         <div class="box-body">
             <div class="row">
                 <div class="col-md-4 text-center">
-                    <!-- Corrected path string parsing template relative to your active XAMPP configurations -->
-                    <img src="{{ $sample->thumbnail ? asset('upload/' . $sample->thumbnail) : asset('no-image.png') }}" class="img-thumbnail" style="width: 100%; max-width: 240px; border-radius: 8px;">
+                    @php 
+                    // Fetch the primary display thumbnail entry directly from public/upload/samples/ directory tracking
+                    $mainThumbRecord = $sample->images()->where('image_path', 'NOT LIKE', 'gallery/%')->first();
+                    $thumbUrl = $mainThumbRecord ? asset('upload/samples/' . $mainThumbRecord->image_path) : asset('no-image.png');
+                    @endphp
+                    <img src="{{ $thumbUrl }}" class="img-thumbnail" style="width: 100%; max-width: 240px; border-radius: 8px;" alt="{{ $sample->name }}" onerror="this.src='{{ asset('no-image.png') }}'">
                     <div style="margin-top: 10px;">
                         @if($sample->featured)
                         <span class="label label-warning">Showroom Highlight</span>
                         @endif
-                        @if($sample->status)
+                        @if($sample->status == 1)
                         <span class="label label-success">Active Track</span>
                         @endif
                     </div>
                 </div>
+
                 <div class="col-md-8">
                     <table class="table table-bordered">
-                        <tr><th width="30%">Sample Model</th><td>{{ $sample->sample_name }}</td></tr>
-                        <tr><th>Style Designation</th><td><strong>{{ $sample->style_no }}</strong></td></tr>
-                        <tr><th>Target Account / Buyer</th><td>{{ $sample->buyer->name ?? 'N/A' }}</td></tr>
-                        <tr><th>Product Division</th><td>{{ $sample->category->name ?? 'N/A' }}</td></tr>
-                        <tr><th>Development Stage (Type)</th><td>{{ $sample->sampleType->name ?? 'N/A' }}</td></tr>
-                        <tr><th>Fabric Structural Base</th><td>{{ $sample->itemType->name ?? 'N/A' }}</td></tr>
-                        <tr><th>Fabric Blend Specs</th><td>{{ $sample->fabric ?? 'N/A' }}</td></tr>
-                        <tr><th>Density (GSM)</th><td>{{ $sample->gsm ?? 'N/A' }}</td></tr>
-                        <tr><th>Color Profile</th><td>{{ $sample->color ?? 'N/A' }}</td></tr>
-                        <tr><th>Size Scale Matrices</th><td>{{ $sample->size_range ?? 'N/A' }}</td></tr>
+                        <tr>
+                            <th width="30%">Sample Model</th>
+                            <td>{{ $sample->name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Style Designation</th>
+                            <td><strong>{{ $sample->style }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Target Account / Buyer</th>
+                            <td>{{ $sample->buyer->name ?? 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Product Division</th>
+                            <td>{{ $sample->category->name ?? 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Development Stage (Type)</th>
+                            <td>{{ $sample->sampleType->name ?? 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Fabric Blend Specs</th>
+                            <td>{{ $sample->fabric ?? 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Density (GSM)</th>
+                            <td>{{ $sample->gsm ?? 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Color Profile</th>
+                            <td>{{ $sample->color ?? 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Size Scale Matrices</th>
+                            <td>{{ $sample->size_range ?? 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Location / Rack</th>
+                            <td>{{ $sample->location ?? 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Quantity Available</th>
+                            <td>{{ $sample->qty ?? 0 }} PCS</td>
+                        </tr>
                         <tr>
                             <th>Construction Notes</th>
                             <td>{!! $sample->description ?: '<span class="text-muted">No configuration notes documented.</span>' !!}</td>
                         </tr>
-                        <tr><th>System Entry Timestamp</th><td>{{ $sample->created_at->toDayDateTimeString() }}</td></tr>
+                        <tr>
+                            <th>System Entry Timestamp</th>
+                            <td>{{ $sample->created_at->toDayDateTimeString() }}</td>
+                        </tr>
                     </table>
                 </div>
             </div>
 
-            <!-- Multi Image Production Companion Catalog Grid Layout -->
-            @if($sample->images && $sample->images->count() > 0)
+
             <div class="row" style="margin-top: 20px;">
                 <div class="col-xs-12">
                     <h4 class="showroom-gallery-title"><i class="fa fa-images"></i> Production Companion Gallery</h4>
                     <div class="gallery-grid-wrapper">
-                        @foreach($sample->images as $photo)
+                        @foreach($sample->images()->where('image_path', 'LIKE', 'gallery/%')->get() as $photo)
                         <div class="gallery-image-card">
-                            <a href="{{ asset('upload/' . $photo->image_path) }}" target="_blank">
-                                <img src="{{ asset('upload/' . $photo->image_path) }}" alt="Gallery Image">
+                            <a href="{{ asset('upload/samples/' . $photo->image_path) }}" target="_blank">
+                                <img src="{{ asset('upload/samples/' . $photo->image_path) }}" alt="Gallery view for {{ $sample->name }}" onerror="this.src='{{ asset('no-image.png') }}'">
                             </a>
                         </div>
                         @endforeach
                     </div>
                 </div>
             </div>
-            @endif
+
 
         </div>
     </div>
 
-    <!-- Live Preview Display Panel -->
     <div class="box box-solid no-print bg-gray" style="padding: 10px;">
         <div class="text-center" style="border-bottom: 1px dashed #999; padding-bottom: 5px; margin-bottom: 8px;">
-            <h4 style="margin:0; font-size: 13px; font-weight:bold; color: #333;">{{ $sample->style_no }}</h4>
+            <h4 style="margin:0; font-size: 13px; font-weight:bold; color: #333;">{{ $sample->style }}</h4>
             <small class="text-muted">{{ $sample->buyer->name ?? 'Generic' }}</small>
         </div>
     </div>
 
-    <!-- Technical Token Execution Matrix -->
     <div class="text-center">
         <div class="printable-area">
-            <p class="style_no_label">{{ $sample->style_no }}</p>
+            <p class="style_no_label">{{ $sample->style }}</p>
             <div>
                 {!! QrCode::size(80)->generate(route('admin.samples.show', $sample->id)); !!}
             </div>

@@ -756,7 +756,7 @@
             <h2 class="fw-bold" data-aos="zoom-in">Let's Build Something Great</h2>
             <p class="text-light opacity-75">Contact FALGUN for premium garment manufacturing solutions</p>
 
-            <a href="https://wa.me/8801404405631" class="btn btn-warning btn-lg rounded-pill mt-3">
+            <a href="https://wa.me/+8801404408880" class="btn btn-warning btn-lg rounded-pill mt-3">
                 WhatsApp Us
             </a>
 

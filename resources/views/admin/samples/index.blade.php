@@ -1,13 +1,7 @@
 @extends('layouts.backend')
 
 @section('top')
-<link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap.min.css">
-
 <style>
-    .hidden-excel-btn {
-        display: none !important;
-    }
     .table-hover tbody tr:hover {
         background-color: #e7f3ff !important;
         color: #0056b3;
@@ -15,6 +9,14 @@
     .modal-header.bg-primary {
         background-color: #3c8dbc !important;
         color: white;
+    }
+    .th-sortable {
+        cursor: pointer;
+        color: #337ab7;
+        text-decoration: none;
+    }
+    .th-sortable:hover {
+        text-decoration: underline;
     }
 </style>
 @endsection
@@ -32,80 +34,162 @@
             <a href="{{ route('admin.samples.create') }}" class="btn btn-success" style="margin-top: -8px;">
                 <i class="fa fa-plus"></i> Add New Sample
             </a>
-            
-            @if(Auth::user()->role == 'admin')
-            <a class="btn btn-warning" href="{{ route('tokens') }}" style="margin-top: -8px;"> Tokens</a>
-            @endif
         </span>
         <hr/>
 
-        <div class="filtering_area">
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label>Filter By Buyer</label>
-                        <select class="form-control filter-control" id="buyer_filter">
-                            <option value="all">All Buyers</option>
-                            @foreach($buyers as $id => $name)
-                            <option value="{{ $id }}">{{ $name }}</option>
-                            @endforeach
-                        </select>
+        <form method="GET" action="{{ url()->current() }}" id="filter-form">
+            <div class="filtering_area">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Global Search</label>
+                            <input type="text" name="search" class="form-control" placeholder="Search PO, style, name..." value="{{ request('search') }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Filter By Buyer</label>
+                            <select class="form-control filter-control" name="buyer_id" id="buyer_id">
+                                <option value="">All Buyers</option>
+                                @foreach($buyers as $id => $name)
+                                <option value="{{ $id }}" {{ request('buyer_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Filter By Category</label>
+                            <select class="form-control filter-control" name="category_id" id="category_id">
+                                <option value="">All Categories</option>
+                                @foreach($categories as $id => $name)
+                                <option value="{{ $id }}" {{ request('category_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" name="location" class="form-control" placeholder="Rack, Room..." value="{{ request('location') }}">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label>Filter By Category</label>
-                        <select class="form-control filter-control" id="category_filter">
-                            <option value="all">All Categories</option>
-                            @foreach($categories as $id => $name)
-                            <option value="{{ $id }}">{{ $name }}</option>
-                            @endforeach
-                        </select>
+                <div class="row">
+                    <div class="col-md-12 text-right" style="margin-top: 10px;">
+                        <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button>
+                        <a href="{{ url()->current() }}?clear_filters=1" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i> Reset</a>
                     </div>
-                </div>
-                <div class="col-md-6 text-right" style="margin-top: 25px;">
-                    <button id="bulk-print" class="btn btn-warning btn-sm"><i class="fa fa-print"></i> Print Marked</button>
-                    <button id="bulk-excel" class="btn btn-info btn-sm"><i class="fa fa-file-excel-o"></i> Export Selection</button>
                 </div>
             </div>
-        </div>
+
+            <input type="hidden" name="sort_by" value="{{ request('sort_by', 'id') }}">
+            <input type="hidden" name="sort_order" value="{{ request('sort_order', 'desc') }}">
+        </form>
     </div>
 
     <div class="box-body table-responsive">
         @if(session('success'))
-            <div class="alert alert-success alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                {{ session('success') }}
-            </div>
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            {{ session('success') }}
+        </div>
         @endif
 
         @if(session('error'))
-            <div class="alert alert-danger alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                {{ session('error') }}
-            </div>
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            {{ session('error') }}
+        </div>
         @endif
 
         <table id="samples-table" class="table table-bordered table-hover table-striped">
             <thead>
                 <tr>
-                    <th width="3%"><input type="checkbox" id="select-all"></th>
+                    <th width="6%">
+                        <a class="th-sortable" href="{{ request()->fullUrlWithQuery(['sort_by' => 'id', 'sort_order' => request('sort_order') === 'asc' ? 'desc' : 'asc']) }}">
+                            ID {!! request('sort_by', 'id') == 'id' ? (request('sort_order') == 'asc' ? '▲' : '▼') : '' !!}
+                        </a>
+                    </th>
                     <th>Image</th>
-                    <th>PO/Item</th>
-                    <th>Season</th>
+                    <th>
+                        <a class="th-sortable" href="{{ request()->fullUrlWithQuery(['sort_by' => 'po', 'sort_order' => request('sort_order') === 'asc' ? 'desc' : 'asc']) }}">
+                            PO/Item {!! request('sort_by') == 'po' ? (request('sort_order') == 'asc' ? '▲' : '▼') : '' !!}
+                        </a>
+                    </th>
+                    <th>
+                        <a class="th-sortable" href="{{ request()->fullUrlWithQuery(['sort_by' => 'season', 'sort_order' => request('sort_order') === 'asc' ? 'desc' : 'asc']) }}">
+                            Season {!! request('sort_by') == 'season' ? (request('sort_order') == 'asc' ? '▲' : '▼') : '' !!}
+                        </a>
+                    </th>
                     <th>Category</th>
-                    <th>Style</th>
-                    <th>Item Name</th>
+                    <th>
+                        <a class="th-sortable" href="{{ request()->fullUrlWithQuery(['sort_by' => 'style', 'sort_order' => request('sort_order') === 'asc' ? 'desc' : 'asc']) }}">
+                            Style {!! request('sort_by') == 'style' ? (request('sort_order') == 'asc' ? '▲' : '▼') : '' !!}
+                        </a>
+                    </th>
+                    <th>
+                        <a class="th-sortable" href="{{ request()->fullUrlWithQuery(['sort_by' => 'name', 'sort_order' => request('sort_order') === 'asc' ? 'desc' : 'asc']) }}">
+                            Item Name {!! request('sort_by') == 'name' ? (request('sort_order') == 'asc' ? '▲' : '▼') : '' !!}
+                        </a>
+                    </th>
                     <th>Buyer</th>
-                    <th>Color</th>
-                    <th>Qty</th>
+                    <th>
+                        <a class="th-sortable" href="{{ request()->fullUrlWithQuery(['sort_by' => 'color', 'sort_order' => request('sort_order') === 'asc' ? 'desc' : 'asc']) }}">
+                            Color {!! request('sort_by') == 'color' ? (request('sort_order') == 'asc' ? '▲' : '▼') : '' !!}
+                        </a>
+                    </th>
+                    <th>
+                        <a class="th-sortable" href="{{ request()->fullUrlWithQuery(['sort_by' => 'qty', 'sort_order' => request('sort_order') === 'asc' ? 'desc' : 'asc']) }}">
+                            Qty {!! request('sort_by') == 'qty' ? (request('sort_order') == 'asc' ? '▲' : '▼') : '' !!}
+                        </a>
+                    </th>
                     <th>Tag</th>
                     <th>Location</th>
                     <th width="10%">Actions</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                @forelse($samples as $sample)
+                <tr>
+                    <td><b>{{ $sample->id }}</b></td>
+                    <td>
+                        @if($sample->images && $sample->images->first())
+                        <img src="{{ asset('upload/samples/' . $sample->images->last()->image_path) }}" alt="Sample Image" style="width: 50px; height: auto;">
+                        @else
+                        <span class="text-muted">No Image</span>
+                        @endif
+                    </td>
+                    <td>{{ $sample->po }}</td>
+                    <td>{{ $sample->season }}</td>
+                    <td>{{ $sample->category->name ?? 'N/A' }}</td>
+                    <td>{{ $sample->style }}</td>
+                    <td>{{ $sample->name }}</td>
+                    <td>{{ $sample->buyer->name ?? 'N/A' }}</td>
+                    <td>{{ $sample->color }}</td>
+                    <td>{{ $sample->qty }}</td>
+                    <td>{{ $sample->tag }}</td>
+                    <td>{{ $sample->location }}</td>
+                    <td>
+                        <a href="{{ route('admin.samples.show', $sample->id) }}" class="btn btn-xs btn-success"><i class="fa fa-eye"></i></a>
+                        <a href="{{ route('admin.samples.edit', $sample->id) }}" class="btn btn-xs btn-primary"><i class="fa fa-edit"></i></a>
+                        <button type="button" onclick="deleteData({{ $sample->id }})" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="13" class="text-center">No samples found matching criteria.</td>
+                </tr>
+                @endforelse
+            </tbody>
         </table>
+
+        <div class="pull-right">
+            {{ $samples->links() }}
+        </div>
     </div>
 </div>
 
@@ -138,105 +222,37 @@
     </div>
 </div>
 
-<iframe id="printf" style="display:none"></iframe>
+<form id="delete-form" method="POST" style="display:none;">
+    @csrf
+    @method('DELETE')
+</form>
 @endsection
 
 @section('bot')
-<script src="{{ asset('assets/bower_components/datatables.net/js/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-
 <script type="text/javascript">
-$(document).ready(function () {
-    var table = $('#samples-table').DataTable({
-        processing: true,
-        serverSide: true,
-        stateSave: true,
-        ajax: {
-            url: "{{ route('admin.api.samples') }}",
-            data: function (d) {
-                d.buyer_filter = $('#buyer_filter').val();
-                d.category_filter = $('#category_filter').val();
-            }
-        },
-        dom: "<'row'<'col-sm-4'l><'col-sm-4 text-center'B><'col-sm-4'f>>t<'row'<'col-sm-5'i><'col-sm-7'p>>",
-        buttons: [{
-            extend: 'excelHtml5',
-            title: 'Sample_Showroom_Export',
-            className: 'hidden-excel-btn',
-            exportOptions: {
-                columns: [2, 3, 4, 5, 6, 7, 8, 9, 10]
-            }
-        }],
-        columns: [
-            {data: 'checkbox', name: 'checkbox', orderable: false, searchable: false},
-            {data: 'show_photo', name: 'show_photo', orderable: false, searchable: false},
-            {data: 'po', name: 'po'},
-            {data: 'season', name: 'season'},
-            {data: 'category', name: 'category'},
-            {data: 'style', name: 'style'},
-            {data: 'name', name: 'name'},
-            {data: 'buyer_name', name: 'buyer.name'},
-            {data: 'color', name: 'color'},
-            {data: 'qty', name: 'qty'},
-            {data: 'tag', name: 'tag'},
-            {data: 'location', name: 'location'},
-            {data: 'action', name: 'action', orderable: false, searchable: false}
-        ],
-        order: [[2, 'desc']] // Default order by PO
+    $(document).ready(function () {
+    $('.filter-control').on('change', function() {
+    $('#filter-form').submit();
     });
-
-    // Custom Filters
-    $('.filter-control').on('change', function () {
-        table.draw();
     });
-
-    // Select All Checkbox
-    $('#select-all').on('click', function () {
-        $('.sample-checkbox').prop('checked', this.checked);
-    });
-
-    // Trigger Hidden Export Button
-    $('#bulk-excel').on('click', function () {
-        table.button('.buttons-excel').trigger();
-    });
-
-    // Bulk Print Logic (Placeholder for your specific print logic)
-    $('#bulk-print').on('click', function() {
-        var selected = [];
-        $('.sample-checkbox:checked').each(function() {
-            selected.push($(this).val());
-        });
-
-        if (selected.length > 0) {
-            window.open("{{ url('admin/samples/print/bulk') }}?ids=" + selected.join(','), '_blank');
-        } else {
-            alert('Please select at least one item to print.');
-        }
-    });
-});
-
-function deleteData(id) {
+    function deleteData(id) {
     if (confirm('Are you sure you want to delete this sample registration?')) {
-        $.ajax({
-            url: "{{ url('admin/samples') }}/" + id,
+    var form = $('#delete-form');
+    form.attr('action', "{{ url('admin/samples') }}/" + id);
+    $.ajax({
+    url: form.attr('action'),
             type: "POST",
-            data: {
-                '_method': 'DELETE',
-                '_token': $('meta[name="csrf-token"]').attr('content')
-            },
+            data: form.serialize(),
             success: function (data) {
-                $('#samples-table').DataTable().ajax.reload();
-                alert(data.message);
+            alert(data.message || 'Sample profile removed successfully.');
+            location.reload();
             },
-            error: function() {
-                alert('Something went wrong during deletion.');
+            error: function (xhr) {
+            console.error(xhr);
+            alert('Something went wrong during deletion.');
             }
-        });
+    });
     }
-}
+    }
 </script>
 @endsection

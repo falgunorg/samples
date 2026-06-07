@@ -71,10 +71,20 @@
                 <div class="card-premium">
                     <h3 class="fw-bold mb-4 text-dark" style="margin-top:0; font-weight:700;">Register Premium Garment Sample</h3>
 
+                    @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+
                     <div class="row">
                         <div class="col-md-6 form-group">
                             <label>Sample Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control" placeholder="e.g., Slim Fit Chino" value="{{ old('name') }}" required>
+                            <input type="text" name="sample_name" class="form-control" placeholder="e.g., Slim Fit Chino" value="{{ old('sample_name') }}" required>
                         </div>
                         <div class="col-md-6 form-group">
                             <label>PO / Item Number</label>
@@ -88,8 +98,8 @@
                             <input type="text" name="season" class="form-control" placeholder="e.g., SS-2024" value="{{ old('season') }}">
                         </div>
                         <div class="col-md-4 form-group">
-                            <label>Style <span class="text-danger">*</span></label>
-                            <input type="text" name="style" class="form-control" placeholder="e.g., W2050" value="{{ old('style') }}" required>
+                            <label>Style No <span class="text-danger">*</span></label>
+                            <input type="text" name="style_no" class="form-control" placeholder="e.g., W2050" value="{{ old('style_no') }}" required>
                         </div>
                         <div class="col-md-4 form-group">
                             <label>Category <span class="text-danger">*</span></label>
@@ -134,7 +144,7 @@
                         </div>
                         <div class="col-md-4 form-group">
                             <label>Qty <span class="text-danger">*</span></label>
-                            <input type="text" name="qty" class="form-control" placeholder="e.g., 1" value="{{ old('qty', 1) }}" required>
+                            <input type="number" name="qty" class="form-control" placeholder="e.g., 1" value="{{ old('qty', 1) }}" required>
                         </div>
                     </div>
 
@@ -148,24 +158,28 @@
                                 @endforeach
                             </select>
                         </div>
+
+                    </div>
+
+                    <div class="row mt-3">
                         <div class="col-md-6 form-group">
                             <label>Location <span class="text-danger">*</span></label>
                             <input type="text" name="location" class="form-control" placeholder="e.g., Rack A-1" value="{{ old('location') }}" required>
                         </div>
+                        <div class="col-md-6 form-group">
+                            <label>Tag / ID <span class="text-danger">*</span></label>
+                            <input type="text" name="tag" class="form-control" placeholder="e.g., TAG-990" value="{{ old('tag', 'New Arrival') }}" required>
+                        </div>
                     </div>
 
                     <div class="row mt-3">
-                        <div class="col-md-4 form-group">
+                        <div class="col-md-6 form-group">
                             <label>Fabric</label>
                             <input type="text" name="fabric" class="form-control" placeholder="e.g., 100% Cotton" value="{{ old('fabric') }}">
                         </div>
-                        <div class="col-md-4 form-group">
+                        <div class="col-md-6 form-group">
                             <label>GSM</label>
                             <input type="text" name="gsm" class="form-control" placeholder="e.g., 180" value="{{ old('gsm') }}">
-                        </div>
-                        <div class="col-md-4 form-group">
-                            <label>Tag / ID <span class="text-danger">*</span></label>
-                            <input type="text" name="tag" class="form-control" placeholder="e.g., TAG-990" value="{{ old('tag') }}" required>
                         </div>
                     </div>
 
@@ -236,8 +250,8 @@ $(document).ready(function () {
         modules: {
             toolbar: [
                 ['bold', 'italic', 'underline'],
-                [{'header': [1, 2, 3, false]}],
-                [{'list': 'ordered'}, {'list': 'bullet'}],
+                ['+123', {'header': [1, 2, 3, false]}],
+                ['ol', {'list': 'ordered'}, {'list': 'bullet'}],
                 ['clean']
             ]
         }

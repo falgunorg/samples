@@ -5,391 +5,204 @@
 @section('content')
 <div class="page-sample-index">
 
-    <!-- =========================================
-    NAVBAR
-    ========================================= -->
+    <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
-
         <div class="container">
-
-            <a class="navbar-brand fw-bold fs-3" href="{{ route('home') }}">
-                FALGUN
-            </a>
-
-            <button class="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#mainNavbar">
-
+            <a class="navbar-brand fw-bold fs-3" href="{{ route('home') }}">FALGUN</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
                 <span class="navbar-toggler-icon"></span>
-
             </button>
-
             <div class="collapse navbar-collapse" id="mainNavbar">
-
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home') }}">
-                            Home
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('samples.index') }}">
-                            Samples
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home') }}#categories">
-                            Categories
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home') }}#factories">
-                            Factories
-                        </a>
-                    </li>
-
+                    <li class="nav-item"><a class="nav-link" href="{{ route('home') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{{ route('samples.index') }}">Samples</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('home') }}#categories">Categories</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('home') }}#factories">Factories</a></li>
                     <li class="nav-item ms-lg-2">
-                        <a href="{{ route('contact') }}"
-                           class="btn btn-warning rounded-pill px-4 fw-semibold">
-                            Contact Us
-                        </a>
+                        <a href="#" class="btn btn-warning rounded-pill px-4 fw-semibold">Contact Us</a>
                     </li>
-
                 </ul>
-
             </div>
-
         </div>
-
     </nav>
 
-
-
-    <!-- =========================================
-    SAMPLES SECTION
-    ========================================= -->
+    <!-- SAMPLES SECTION -->
     <section class="py-5 bg-white">
-
         <div class="container">
-
-            @php
-
-            $samples = [
-
-            [
-            'id'=>1,
-            'name'=>'Oversized Premium Tee',
-            'buyer'=>'ZARA',
-            'category'=>'T-Shirts',
-            'img'=>'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'id'=>2,
-            'name'=>'Luxury Denim Jacket',
-            'buyer'=>'H&M',
-            'category'=>'Denim',
-            'img'=>'https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'id'=>3,
-            'name'=>'Modern Activewear',
-            'buyer'=>'NIKE',
-            'category'=>'Sportswear',
-            'img'=>'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'id'=>4,
-            'name'=>'Premium Polo Collection',
-            'buyer'=>'PUMA',
-            'category'=>'Polo',
-            'img'=>'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'id'=>5,
-            'name'=>'Luxury Hoodie',
-            'buyer'=>'ADIDAS',
-            'category'=>'Hoodies',
-            'img'=>'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'id'=>6,
-            'name'=>'Formal Shirt Series',
-            'buyer'=>'MANGO',
-            'category'=>'Formal Wear',
-            'img'=>'https://images.unsplash.com/photo-1603252109303-2751441dd157?q=80&w=1200&auto=format&fit=crop'
-            ]
-
-            ];
-
-            @endphp
-
-            <!-- TITLE -->
             <div class="position-relative">
                 <div class="row align-items-center g-4">
-
-                    <!-- LEFT CONTENT -->
                     <div class="col-lg-3">
-
-                        <span class="filter-mini-title">
-                            FIND YOUR STYLE
-                        </span>
-
-                        <h3 class="fw-bold mb-2">
-                            Filter Samples
-                        </h3>
-
-                        <p class="text-muted small mb-0">
-                            Search premium apparel collections by buyer, category, or garment type.
-                        </p>
-
+                        <span class="filter-mini-title text-muted small fw-bold">FIND YOUR STYLE</span>
+                        <h3 class="fw-bold mb-2">Filter Samples</h3>
+                        <p class="text-muted small mb-0">Search premium apparel collections by buyer, category, or garment type.</p>
                     </div>
 
                     <!-- FILTER FORM -->
                     <div class="col-lg-9">
-
-                        <form method="GET">
-
+                        <form method="GET" action="{{ route('samples.index') }}" id="filterForm">
                             <div class="row g-3">
-
-                                <!-- SEARCH -->
+                                <!-- SEARCH INPUT -->
                                 <div class="col-lg-4">
-
                                     <div class="modern-input-group">
-
-                                        <span class="input-icon">
-                                            <i class="fas fa-search"></i>
-                                        </span>
-
-                                        <input type="text"
-                                               class="form-control modern-input"
-                                               placeholder="Search samples...">
-
+                                        <input type="text" name="search" class="form-control" placeholder="Search samples..." value="{{ request('search') }}">
                                     </div>
-
                                 </div>
 
-                                <!-- BUYER -->
+                                <!-- BUYER SELECT DROPDOWN -->
                                 <div class="col-lg-3">
-
-                                    <div class="modern-select-group">
-
-                                        <span class="input-icon">
-                                            <i class="fas fa-user-tie"></i>
-                                        </span>
-
-                                        <select class="form-select modern-select">
-
-                                            <option>All Buyers</option>
-                                            <option>ZARA</option>
-                                            <option>H&M</option>
-                                            <option>NIKE</option>
-                                            <option>PUMA</option>
-
-                                        </select>
-
-                                    </div>
-
+                                    <select name="buyer" class="form-select">
+                                        <option value="All Buyers">All Buyers</option>
+                                        @foreach($buyers as $buyer)
+                                        <option value="{{ $buyer->name }}" {{ request('buyer') == $buyer->name ? 'selected' : '' }}>{{ $buyer->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
 
-                                <!-- CATEGORY -->
+                                <!-- ORIGINAL RESTORED CATEGORY SELECT DROPDOWN -->
                                 <div class="col-lg-3">
-
-                                    <div class="modern-select-group">
-
-                                        <span class="input-icon">
-                                            <i class="fas fa-tags"></i>
-                                        </span>
-
-                                        <select class="form-select modern-select">
-
-                                            <option>All Categories</option>
-                                            <option>T-Shirts</option>
-                                            <option>Denim</option>
-                                            <option>Sportswear</option>
-                                            <option>Formal Wear</option>
-
-                                        </select>
-
-                                    </div>
-
+                                    <select name="category" id="categorySelect" class="form-select">
+                                        <option value="All Categories">All Categories</option>
+                                        @foreach($allCategories as $cat)
+                                        <option value="{{ $cat->name }}" {{ request('category') == $cat->name ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
 
-                                <!-- BUTTON -->
-                                <div class="col-lg-2">
-
-                                    <button class="btn filter-btn w-100">
-                                        Apply
-                                    </button>
-
+                                <!-- FORM EXECUTION ACTIONS -->
+                                <div class="col-lg-2 d-flex gap-2">
+                                    <button type="submit" class="btn btn-dark w-100">Apply</button>
+                                    @if(request('search') || (request('buyer') && request('buyer') !== 'All Buyers') || (request('category') && request('category') !== 'All Categories'))
+                                        <a href="{{ route('samples.index') }}" class="btn btn-outline-danger" title="Reset Filters">
+                                            <i class="fas fa-sync-alt"></i> Reset
+                                        </a>
+                                    @endif
                                 </div>
-
                             </div>
 
-                            <!-- QUICK TAGS -->
+                            <!-- DYNAMIC QUICK FILTERS LIST: ALL + TOP 5 CATEGORIES -->
                             <div class="mt-4 d-flex flex-wrap gap-2">
+                                @php
+                                    $currentSelection = request('category', 'All Categories');
+                                    $isAllActive = ($currentSelection === 'All Categories' || $currentSelection === 'All');
+                                @endphp
 
-                                <span class="quick-filter active">
+                                <!-- 1. Static 'All' Trigger Badge -->
+                                <span class="badge rounded-pill p-2 px-3 quick-filter-tag fw-semibold" 
+                                      onclick="filterByCategoryBadge('All')" 
+                                      style="cursor: pointer; transition: all 0.2s ease-in-out; 
+                                             {{ $isAllActive ? 'background-color: #212529; color: #fff; border: 1px solid #212529;' : 'background-color: #f8f9fa; color: #212529; border: 1px solid #dee2e6;' }}">
                                     All
                                 </span>
 
-                                <span class="quick-filter">
-                                    New Arrival
-                                </span>
-
-                                <span class="quick-filter">
-                                    Trending
-                                </span>
-
-                                <span class="quick-filter">
-                                    Streetwear
-                                </span>
-
-                                <span class="quick-filter">
-                                    Denim
-                                </span>
-
-                                <span class="quick-filter">
-                                    Activewear
-                                </span>
-                                <span class="quick-filter">
-                                    Nightwear
-                                </span>
-                                <span class="quick-filter">
-                                    Sportswear
-                                </span>
-
-
+                                <!-- 2. Top 5 Categories Dynamic Loop Mapping -->
+                                @foreach($topCategories as $topCat)
+                                    @php
+                                        $isThisActive = ($currentSelection === $topCat->name);
+                                    @endphp
+                                    <span class="badge rounded-pill p-2 px-3 quick-filter-tag fw-semibold" 
+                                          onclick="filterByCategoryBadge('{{ $topCat->name }}')" 
+                                          style="cursor: pointer; transition: all 0.2s ease-in-out; 
+                                                 {{ $isThisActive ? 'background-color: #212529; color: #fff; border: 1px solid #212529;' : 'background-color: #f8f9fa; color: #212529; border: 1px solid #dee2e6;' }}">
+                                        {{ $topCat->name }}
+                                    </span>
+                                @endforeach
                             </div>
-
                         </form>
                     </div>
-
                 </div>
             </div>
             <br/>
 
-            <!-- GRID -->
-            <div class="row g-4">
-
-                @foreach($samples as $sample)
-
-                <div class="col-lg-4 col-md-6" data-aos="fade-up">
-
-                    <div class="base-sample-card bg-white rounded-4 overflow-hidden shadow-sm">
-
-                        <!-- IMAGE -->
-                        <div class="sample-image-wrapper position-relative">
-
-                            <img src="{{ $sample['img'] }}"
-                                 class="sample-image">
-
-                            <!-- CATEGORY -->
-                            <div class="position-absolute top-0 start-0 p-3">
-
-                                <span class="badge bg-danger px-3 py-2">
-                                    {{ $sample['category'] }}
-                                </span>
-
-                            </div>
-
-                            <!-- WISHLIST -->
-                            <div class="position-absolute top-0 end-0 p-3">
-
-                                <button class="btn btn-light rounded-circle shadow-sm wishlist-btn">
-                                    <i class="far fa-heart"></i>
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                        <!-- CONTENT -->
-                        <div class="p-4">
-
-                            <!-- BUYER -->
-                            <small class="text-warning fw-bold text-uppercase">
-                                {{ $sample['buyer'] }}
-                            </small>
-
-                            <!-- NAME -->
-                            <h5 class="fw-bold mt-2 sample-title">
-                                {{ $sample['name'] }}
-                            </h5>
-
-                            <!-- DESCRIPTION -->
-                            <p class="text-muted small">
-                                Premium export-quality apparel designed for global fashion brands.
-                            </p>
-
-                            <!-- FOOTER -->
-                            <div class="d-flex justify-content-between align-items-center">
-
-                                <a href="{{ route('samples.details') }}"
-                                   class="btn btn-dark rounded-pill px-4">
-                                    View Details
-                                </a>
-
-                                <span class="text-muted small">
-                                    New Arrival
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
+            <!-- CARDS GRID VIEWPORT container target wrapper -->
+            <div class="row g-4" id="samplesContainer">
+                @include('frontend.samples.partials.grid_items')
+                
+                @if($samples->isEmpty())
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">No items match your selected filter options.</p>
                 </div>
-
-                @endforeach
-
+                @endif
             </div>
-            <br/>
-            <br/>
+            <br/><br/>
 
-            <div class="text-center">
-                <a class="btn btn-outline-dark btn-lg rounded-pill px-4" href="#">
+            <!-- LOAD MORE FOOTER SECTION -->
+            <div class="text-center mt-4">
+                <button type="button" 
+                        class="btn btn-outline-dark btn-lg rounded-pill px-4" 
+                        id="loadMoreBtn"
+                        data-next-page="{{ $samples->nextPageUrl() }}"
+                        style="{{ $samples->hasMorePages() ? '' : 'display: none;' }}">
+                    <span class="spinner-border spinner-border-sm me-2 d-none" id="btnSpinner" role="status"></span>
                     LOAD MORE
-                </a>
+                </button>
+                
+                <div id="noMoreMessage" class="text-muted small text-uppercase fw-semibold {{ !$samples->hasMorePages() && $samples->total() > 0 ? '' : 'd-none' }}">
+                    You've viewed all matching items
+                </div>
             </div>
 
         </div>
-
     </section>
-
-    <!-- =========================================
-    CTA SECTION
-    ========================================= -->
-    <section class="py-5 bg-dark text-white text-center">
-
-        <div class="container py-4">
-
-            <h2 class="fw-bold">
-                Looking For Custom Apparel Manufacturing?
-            </h2>
-
-            <p class="text-light opacity-75 mt-3">
-                Contact FALGUN for premium garment production solutions.
-            </p>
-
-            <a href="#"
-               class="btn btn-warning btn-lg rounded-pill px-5 mt-3">
-                Contact Us
-            </a>
-
-        </div>
-
-    </section>
-
 </div>
+
+<!-- AJAX INFINITE SCROLL AND DROPDOWN INTEGRATION SCRIPT -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        const samplesContainer = document.getElementById('samplesContainer');
+        const btnSpinner = document.getElementById('btnSpinner');
+        const noMoreMessage = document.getElementById('noMoreMessage');
+
+        if(loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', function() {
+                let nextPageUrl = loadMoreBtn.getAttribute('data-next-page');
+                if(!nextPageUrl) return;
+
+                loadMoreBtn.disabled = true;
+                btnSpinner.classList.remove('d-none');
+
+                fetch(nextPageUrl, {
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                })
+                .then(response => response.text())
+                .then(htmlData => {
+                    samplesContainer.insertAdjacentHTML('beforeend', htmlData);
+                    
+                    let urlObj = new URL(nextPageUrl);
+                    let currentPage = parseInt(urlObj.searchParams.get('page'));
+                    urlObj.searchParams.set('page', currentPage + 1);
+                    let deeperPageUrl = urlObj.toString();
+
+                    if(htmlData.trim() === '') {
+                        loadMoreBtn.style.display = 'none';
+                        noMoreMessage.classList.remove('d-none');
+                    } else {
+                        loadMoreBtn.setAttribute('data-next-page', deeperPageUrl);
+                        loadMoreBtn.disabled = false;
+                        btnSpinner.classList.add('d-none');
+                    }
+                })
+                .catch(err => {
+                    console.error("AJAX error loading subsequent chunk payloads", err);
+                    loadMoreBtn.disabled = false;
+                    btnSpinner.classList.add('d-none');
+                });
+            });
+        }
+    });
+
+    // Synchronizes clicked badge list directly into the category drop select element framework
+    function filterByCategoryBadge(categoryValue) {
+        const selectBox = document.getElementById('categorySelect');
+        
+        if (categoryValue === 'All') {
+            selectBox.value = 'All Categories';
+        } else {
+            selectBox.value = categoryValue;
+        }
+        
+        // Execute form submission metrics natively
+        document.getElementById('filterForm').submit();
+    }
+</script>
 @endsection

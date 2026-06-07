@@ -172,7 +172,7 @@ MODERN FOOTER
                             </small>
 
                             <p class="mb-0">
-                                +880 1404408888
+                                +8801404408880
                             </p>
 
                         </div>
@@ -293,7 +293,7 @@ MODERN FOOTER
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3">
 
                 <p class="mb-0 footer-small">
-                    © {{ date('Y') }} FALGUN Apparel Ltd. All Rights Reserved.
+                    © {{ date('Y') }} <a target="_blank" href="https://www.falgun.com">FALGUN</a>. All Rights Reserved.
                 </p>
 
                 <div class="d-flex gap-4">
@@ -319,7 +319,7 @@ MODERN FOOTER
     </div>
 
     <!-- FLOATING WHATSAPP -->
-    <a href="https://wa.me/8801711000000"
+    <a href="https://wa.me/8801404408880"
        class="floating-whatsapp"
        target="_blank">
 
