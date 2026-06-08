@@ -41,7 +41,7 @@
                 <!-- LEFT GALLERY SIDE -->
                 <div class="col-lg-6">
                     <!-- MAIN HERO IMAGE (Reads directly from public/upload/samples/) -->
-                    <div class="main-image-card rounded-4 overflow-hidden shadow-sm border mb-3">
+                    <div style="text-align: center; padding: 15px" class="main-image-card rounded-4 overflow-hidden   mb-3">
                         @php 
                         $firstImageRecord = $sample->images->first();
 
@@ -59,7 +59,7 @@
                              class="sample-main-image" 
                              id="expandedImg" 
                              alt="{{ $sample->name }}" 
-                             style="width:100%; height: 500px; object-fit: cover;">
+                             style="width:100%; height: 100%; object-fit: cover; border-radius: 15px">
                     </div>
 
                     <!-- RECURSIVE SUB-THUMBNAILS GALLERY -->
@@ -153,47 +153,47 @@
             </div>
 
             <div class="row g-4">
-    @foreach($relatedSamples as $item)
-    <div class="col-lg-3 col-md-6">
-        <div class="related-card border rounded p-3 shadow-sm h-100 d-flex flex-column justify-content-between">
-            <div>
-                <div class="overflow-hidden rounded-3">
-                    @php
-                        // Filter the eager-loaded collection memory safely for the main profile image
-                        $itemThumbRecord = $item->images->first(function ($image) {
-                            return !str_contains($image->image_path, 'gallery/');
-                        });
+                @foreach($relatedSamples as $item)
+                <div class="col-lg-3 col-md-6">
+                    <div class="related-card border rounded p-3 shadow-sm h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="overflow-hidden rounded-3">
+                                @php
+                                // Filter the eager-loaded collection memory safely for the main profile image
+                                $itemThumbRecord = $item->images->first(function ($image) {
+                                return !str_contains($image->image_path, 'gallery/');
+                                });
 
-                        // Match path directly against public/upload/samples/
-                        $itemThumbUrl = $itemThumbRecord 
-                            ? asset('upload/samples/' . $itemThumbRecord->image_path) 
-                            : asset('no-image.png') ;
-                    @endphp
-                    
-                    <img src="{{ $itemThumbUrl }}" 
-                         class="related-image" 
-                         alt="{{ $item->name }}"
-                         style="width:100%; height:250px; object-fit:cover;"
-                         onerror="this.src='{{ asset('no-image.png') }}'">
-                </div>
-                
-                <div class="pt-3">
-                    <small class="text-warning fw-bold d-block text-uppercase">
-                        {{ $item->buyer->name ?? 'Brand' }}
-                    </small>
-                    <h5 class="fw-bold mt-1 mb-0" style="font-size: 1.1rem;">{{ $item->name }}</h5>
-                </div>
-            </div>
+                                // Match path directly against public/upload/samples/
+                                $itemThumbUrl = $itemThumbRecord 
+                                ? asset('upload/samples/' . $itemThumbRecord->image_path) 
+                                : asset('no-image.png') ;
+                                @endphp
 
-            <div class="pt-3 mt-auto">
-                <a href="{{ route('samples.show', $item->id) }}" class="btn btn-dark btn-sm rounded-pill px-4">
-                    View Details
-                </a>
+                                <img src="{{ $itemThumbUrl }}" 
+                                     class="related-image" 
+                                     alt="{{ $item->name }}"
+                                     style="width:100%; height:250px; object-fit:cover;"
+                                     onerror="this.src='{{ asset('no-image.png') }}'">
+                            </div>
+
+                            <div class="pt-3">
+                                <small class="text-warning fw-bold d-block text-uppercase">
+                                    {{ $item->buyer->name ?? 'Brand' }}
+                                </small>
+                                <h5 class="fw-bold mt-1 mb-0" style="font-size: 1.1rem;">{{ $item->name }}</h5>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 mt-auto">
+                            <a href="{{ route('samples.show', $item->id) }}" class="btn btn-dark btn-sm rounded-pill px-4">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
             </div>
-        </div>
-    </div>
-    @endforeach
-</div>
         </div>
     </section>
 

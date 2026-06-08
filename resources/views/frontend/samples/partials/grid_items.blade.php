@@ -18,7 +18,6 @@
                 <img src="{{ $thumbUrl }}" 
                      class="sample-image" 
                      alt="{{ $sample->name }}" 
-                     style="width:100%; height:350px; object-fit:cover;"
                      onerror="this.src='{{ asset('no-image.png') }}'">
             </a>
             <div class="position-absolute top-0 start-0 p-3">
