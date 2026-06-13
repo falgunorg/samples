@@ -99,6 +99,7 @@ Route::middleware(['auth', 'verified'])
             /* --- Inquiry Management --- */
             Route::get('/inquiries', [AdminInquiryController::class, 'index'])->name('inquiries.index');
             Route::get('/inquiries/{id}', [AdminInquiryController::class, 'show'])->name('inquiries.show');
+            Route::patch('/inquiries/{id}/toggle-read', [AdminInquiryController::class, 'toggleRead'])->name('inquiries.toggle-read'); // <-- ADD THIS LINE
             Route::delete('/inquiries/{id}', [AdminInquiryController::class, 'destroy'])->name('inquiries.destroy');
         });
 
