@@ -16,7 +16,7 @@ class SampleController extends Controller {
         $categoryFilter = $request->input('category');
 
         // 1. Build Query with eager loading relationships
-        $query = Sample::with(['buyer', 'category', 'images']);
+        $query = Sample::with(['buyer', 'category', 'images'])->has('images');
 
         $query->where(function ($q) {
             $q->where('status', 'active')
