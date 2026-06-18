@@ -1,11 +1,18 @@
 @extends('layouts.guest')
 
+<<<<<<< HEAD
 @section('title', 'FALGUN | Premium Sample Collection')
+=======
+@section('title', 'FALGUN | Premium Category Collection')
+>>>>>>> 1ff7942 (Update on 18th July Added Category in Frontend)
 
 @section('content')
 <div class="page-sample-index">
 
+<<<<<<< HEAD
     <!-- NAVBAR -->
+=======
+>>>>>>> 1ff7942 (Update on 18th July Added Category in Frontend)
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold fs-3" href="{{ route('home') }}">FALGUN</a>
@@ -15,8 +22,13 @@
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
                     <li class="nav-item"><a class="nav-link" href="{{ route('home') }}">Home</a></li>
+<<<<<<< HEAD
                     <li class="nav-item"><a class="nav-link active" href="{{ route('samples.index') }}">Samples</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ route('home') }}#categories">Categories</a></li>
+=======
+                    <li class="nav-item"><a class="nav-link" href="{{ route('samples.index') }}">Samples</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{{ route('categories.index') }}">Categories</a></li>
+>>>>>>> 1ff7942 (Update on 18th July Added Category in Frontend)
                     <li class="nav-item"><a class="nav-link" href="{{ route('home') }}#factories">Factories</a></li>
                     <li class="nav-item ms-lg-2">
                         <a href="#" class="btn btn-warning rounded-pill px-4 fw-semibold">Contact Us</a>
@@ -26,12 +38,16 @@
         </div>
     </nav>
 
+<<<<<<< HEAD
     <!-- SAMPLES SECTION -->
+=======
+>>>>>>> 1ff7942 (Update on 18th July Added Category in Frontend)
     <section class="py-5 bg-white">
         <div class="container">
             <div class="position-relative">
                 <div class="row align-items-center g-4">
                     <div class="col-lg-3">
+<<<<<<< HEAD
                         <span class="filter-mini-title text-muted small fw-bold">FIND YOUR STYLE</span>
                         <h3 class="fw-bold mb-2">Filter Samples</h3>
                         <p class="text-muted small mb-0">Search premium apparel collections by buyer, category, or garment type.</p>
@@ -106,6 +122,21 @@
                                         {{ $topCat->name }}
                                     </span>
                                 @endforeach
+=======
+                        <span class="filter-mini-title text-muted small fw-bold">FIND YOUR CATEGORIES</span>
+                        <h3 class="fw-bold mb-2">Filter Categories</h3>
+                        <p class="text-muted small mb-0">Search premium apparel collections by buyer, category, or garment type.</p>
+                    </div>
+
+                    <div class="col-lg-9">
+                        <form method="GET" action="{{ route('categories.index') }}" id="filterForm">
+                            <div class="row g-3">
+                                <div class="col-lg-4">
+                                    <div class="modern-input-group">
+                                        <input type="text" name="search" class="form-control" placeholder="Search categories..." value="{{ request('search') }}">
+                                    </div>
+                                </div>
+>>>>>>> 1ff7942 (Update on 18th July Added Category in Frontend)
                             </div>
                         </form>
                     </div>
@@ -113,6 +144,7 @@
             </div>
             <br/>
 
+<<<<<<< HEAD
             <!-- CARDS GRID VIEWPORT container target wrapper -->
             <div class="row g-4" id="samplesContainer">
                 @include('frontend.samples.partials.grid_items')
@@ -126,10 +158,40 @@
             <br/><br/>
 
             <!-- LOAD MORE FOOTER SECTION -->
+=======
+            <div class="row g-4" id="categories-wrapper">
+                @forelse($categories as $cat)
+                <div class="col-lg-3 col-md-4 col-6" data-aos="zoom-in">
+                    <a href="{{route('categories.show', $cat->slug)}}">
+                        <div class="position-relative rounded-4 overflow-hidden shadow-sm category-card">
+                            <img src="{{ asset($cat->img) }}"
+                                 class="w-100 category-img"
+                                 alt="{{ $cat->name }}"
+                                 style="height: 380px; background: #ffcd39; object-fit: contain;"> 
+                            <div class="position-absolute bottom-0 start-0 w-100 p-3"
+                                 style="background: linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0.4), transparent);">
+                                <h6 class="text-white fw-bold mb-0">{{ $cat->name }}</h6>
+                                <small class="text-warning">{{ $cat->samples_count }} Samples</small>
+                            </div>
+                        </div>
+
+                    </a>
+
+                </div>
+                @empty
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">No categories found matching your search.</p>
+                </div>
+                @endforelse
+            </div>
+            <br/><br/>
+
+>>>>>>> 1ff7942 (Update on 18th July Added Category in Frontend)
             <div class="text-center mt-4">
                 <button type="button" 
                         class="btn btn-outline-dark btn-lg rounded-pill px-4" 
                         id="loadMoreBtn"
+<<<<<<< HEAD
                         data-next-page="{{ $samples->nextPageUrl() }}"
                         style="{{ $samples->hasMorePages() ? '' : 'display: none;' }}">
                     <span class="spinner-border spinner-border-sm me-2 d-none" id="btnSpinner" role="status"></span>
@@ -137,10 +199,20 @@
                 </button>
                 
                 <div id="noMoreMessage" class="text-muted small text-uppercase fw-semibold {{ !$samples->hasMorePages() && $samples->total() > 0 ? '' : 'd-none' }}">
+=======
+                        data-next-page="{{ $categories->nextPageUrl() }}"
+                        style="{{ $categories->hasMorePages() ? '' : 'display: none;' }}">
+                    <span class="spinner-border spinner-border-sm me-2 d-none" id="btnSpinner" role="status"></span>
+                    LOAD MORE
+                </button>
+
+                <div id="noMoreMessage" class="text-muted small text-uppercase fw-semibold {{ !$categories->hasMorePages() && $categories->total() > 0 ? '' : 'd-none' }}">
+>>>>>>> 1ff7942 (Update on 18th July Added Category in Frontend)
                     You've viewed all matching items
                 </div>
             </div>
 
+<<<<<<< HEAD
         </div>
     </section>
 </div>
@@ -205,4 +277,64 @@
         document.getElementById('filterForm').submit();
     }
 </script>
+=======
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+                    if (loadMoreBtn) {
+                        loadMoreBtn.addEventListener('click', function () {
+                            let button = this;
+                            let nextPageUrl = button.getAttribute('data-next-page');
+                            let spinner = document.getElementById('btnSpinner');
+                            let noMoreMsg = document.getElementById('noMoreMessage');
+                            let wrapper = document.getElementById('categories-wrapper');
+
+                            if (!nextPageUrl)
+                                return;
+
+                            // UI Loading Feedback
+                            spinner.classList.remove('d-none');
+                            button.disabled = true;
+
+                            // Async Fetch Connection Handshake
+                            fetch(nextPageUrl, {
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            })
+                                    .then(response => {
+                                        if (!response.ok)
+                                            throw new Error('Network error received.');
+                                        return response.json();
+                                    })
+                                    .then(data => {
+                                        // Dynamic elements processing and placement
+                                        wrapper.insertAdjacentHTML('beforeend', data.html);
+
+                                        // Component state updates
+                                        if (data.hasMorePages) {
+                                            button.setAttribute('data-next-page', data.nextPageUrl);
+                                            button.disabled = false;
+                                        } else {
+                                            button.style.display = 'none';
+                                            noMoreMsg.classList.remove('d-none');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error fetching data execution:', error);
+                                        button.disabled = false;
+                                    })
+                                    .finally(() => {
+                                        spinner.classList.add('d-none');
+                                    });
+                        });
+                    }
+                });
+            </script>
+
+        </div>
+    </section>
+</div>
+>>>>>>> 1ff7942 (Update on 18th July Added Category in Frontend)
 @endsection

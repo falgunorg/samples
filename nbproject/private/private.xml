@@ -4,6 +4,14 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/D:/xampp/htdocs/samples/app/Http/Controllers/Admin/CategoryController.php</file>
+            <file>file:/D:/xampp/htdocs/samples/app/Http/Controllers/Frontend/HomeController.php</file>
+            <file>file:/D:/xampp/htdocs/samples/routes/web.php</file>
+            <file>file:/D:/xampp/htdocs/samples/resources/views/frontend/categories/index.blade.php</file>
+            <file>file:/D:/xampp/htdocs/samples/resources/views/frontend/samples/index.blade.php</file>
+            <file>file:/D:/xampp/htdocs/samples/resources/views/frontend/categories/show.blade.php</file>
+            <file>file:/D:/xampp/htdocs/samples/resources/views/frontend/home.blade.php</file>
+            <file>file:/D:/xampp/htdocs/samples/resources/css/app.css</file>
+            <file>file:/D:/xampp/htdocs/samples/public/css/app.css</file>
         </group>
     </open-files>
 </project-private>

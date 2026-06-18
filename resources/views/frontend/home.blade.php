@@ -521,98 +521,31 @@
                 </p>
             </div>
 
-            @php
-            $categories = [
-
-            [
-            'name' => 'T-Shirts',
-            'img' => 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'name' => 'Polo Shirts',
-            'img' => 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'name' => 'Denim Jeans',
-            'img' => 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'name' => 'Jackets',
-            'img' => 'https://images.unsplash.com/photo-1523398002811-999ca8dec234?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'name' => 'Activewear',
-            'img' => 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'name' => 'Kidswear',
-            'img' => 'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'name' => 'Sweatshirts',
-            'img' => 'https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'name' => 'Sportswear',
-            'img' => 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'name' => 'Formal Wear',
-            'img' => 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'name' => 'Shirts',
-            'img' => 'https://images.unsplash.com/photo-1603252109303-2751441dd157?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'name' => 'Hoodies',
-            'img' => 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1200&auto=format&fit=crop'
-            ],
-
-            [
-            'name' => 'Loungewear',
-            'img' => 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=1200&auto=format&fit=crop'
-            ]
-
-            ];
-            @endphp
-
             <div class="row g-4">
-
                 @foreach($categories as $cat)
-
                 <div class="col-lg-3 col-md-4 col-6" data-aos="zoom-in">
+                    <a href="{{route('categories.show', $cat->slug)}}">
+                        <div class="position-relative rounded-4 overflow-hidden shadow-sm category-card">
 
-                    <div class="position-relative rounded-4 overflow-hidden shadow-sm category-card">
-
-                        <img src="{{ $cat['img'] }}"
-                             class="w-100 category-img"
-                             alt="{{ $cat['name'] }}">
-
-                        <div class="position-absolute bottom-0 start-0 w-100 p-3"
-                             style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);">
-
-                            <h6 class="text-white fw-bold mb-0">{{ $cat['name'] }}</h6>
+                            <img src="{{ asset($cat->img) }}"
+                                 class="w-100 category-img"
+                                 alt="{{ $cat->name }}"
+                                 style="height: 380px; background: #ffcd39"> <div class="position-absolute bottom-0 start-0 w-100 p-3"
+                                 style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);">
+                                <h6 class="text-white fw-bold mb-0">{{ $cat->name }}</h6>
+                            </div>
 
                         </div>
-
-                    </div>
-
+                    </a>
                 </div>
-
                 @endforeach
-
             </div>
+            <br>
+
+            <a href="{{ route('categories.index') }}"
+               class="btn btn-dark rounded-pill px-4 mt-3 mt-md-0">
+                Explore All
+            </a>
 
         </div>
 

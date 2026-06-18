@@ -35,6 +35,10 @@ use App\Http\Controllers\Admin\DashboardController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::any('/contact', [HomeController::class, 'contact'])->name('contact');
 
+Route::get('/categories', [HomeController::class, 'categories'])->name('categories.index');
+Route::get('/categories/{slug}', [HomeController::class, 'category_details'])->name('categories.show');
+
+
 // All Samples
 //Route::get('/samples', [SampleController::class, 'index'])->name('samples.index');
 //Route::get('/samples-details', [SampleController::class, 'details'])->name('samples.details');
